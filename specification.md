@@ -16,9 +16,11 @@ Last Synced: 2026-04-14
 Current Active Prompt: `steps/step-one-prompt.md`
 Current Active Reference: `agent-docs/tutu.md`
 
-Latest Backend Status (Iteration 1):
+Latest Backend Status (Iteration 2):
 - Class-based FastAPI Phase-1 foundation implemented in `documind/backend/app/`
 - Working endpoints for instances, KBs, ingestion, search/query, memory, and observability
-- Control-plane storage currently implemented with SQLite for speed
-- Prisma schema added for planned PostgreSQL migration path
+- Control-plane storage decision is locked to SQLite for the advanced-retrieval phase and validation cycle
+- Prisma schema remains available for later Neon/PostgreSQL migration when deployment/multi-user needs start
+- Deployment complexity is intentionally deferred for current hackathon phase
+- CLI wrapper vs MCP server integration packaging will be decided after filtered + hybrid feature implementation/testing
 Latest Spec Update: Added embedding profile matrix in `SPEC.md` for general text, high-quality text, balanced text, multimodal (image+text), and code search model routing.

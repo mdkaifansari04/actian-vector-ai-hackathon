@@ -164,6 +164,8 @@ This pattern is known as **Retrieval-Augmented Generation (RAG)**, and DocuMind 
 - **Python** — primary language
 - **FastAPI** — for exposing the ingestion and query APIs
 - **LangChain** or **LlamaIndex** — agent framework
+- **SQLite (current phase)** — active control-plane metadata store for hackathon velocity
+- **Prisma + PostgreSQL/Neon (deferred)** — migration path for deployment and multi-user phases
 
 ### Document Parsing
 
@@ -881,6 +883,7 @@ Update observability thresholds and alert channels.
 - [ ] Real-time streaming responses
 - [ ] Native Confluence / Notion connectors (manual export/import first)
 - [ ] Grafana/Prometheus dashboard integration (use API + simple UI instead)
+- [ ] Cloud deployment complexity and remote control-plane migration during this phase
 
 ---
 
@@ -901,6 +904,7 @@ Update observability thresholds and alert channels.
 | Drift detection                 | Detect when document corpus changes make existing embeddings stale, triggering re-indexing     |
 | A/B testing for retrieval       | Compare different embedding models or chunk strategies side-by-side using observability scores |
 | Compliance audit trail          | Immutable log of all queries, retrieved context, and quality scores for regulatory compliance  |
+| CLI/MCP integration packaging   | Ship a first-class DocuMind integration surface (CLI wrapper or MCP server) for external agents |
 
 ---
 

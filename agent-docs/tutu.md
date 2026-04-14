@@ -65,6 +65,13 @@ Current Focus: Step One Prompt execution (backend-first).
    - Prefer class-based architecture for clean structure.
    - Keep comments minimal; add only high-value comments where needed.
    - Skip TDD workflow for now; prioritize fast, production-feel iteration speed.
+6. Control-plane DB decision for current phase:
+   - Keep SQLite as the active backend through advanced retrieval implementation and testing.
+   - Defer Neon/PostgreSQL migration for later deployment/multi-user phase.
+7. Deployment scope decision:
+   - Deployment complexity is intentionally out of scope for current phase.
+8. Integration packaging decision:
+   - Choose CLI wrapper vs MCP server after filtered + hybrid features are implemented and validated.
 
 ---
 
@@ -198,7 +205,7 @@ uvicorn app.main:app --reload --port 8000
 ## 8. Open Risks / Blockers
 
 1. `documind/backend/requirements.txt` currently uses `=` pins; should move to `==` for reproducible installs.
-2. Prisma/PostgreSQL path is not wired yet; current control plane uses SQLite for speed.
+2. Prisma/PostgreSQL path is not wired yet; this is an intentional deferral for current hackathon scope.
 3. Need richer ingestion support for larger PDFs/URLs and async job processing.
 4. Need stronger scoring (ragas/LLM-judge) instead of placeholder observability values.
 
@@ -229,8 +236,34 @@ uvicorn app.main:app --reload --port 8000
   - resource ingestion returns `chunks_indexed > 0`
   - `/search`, `/query`, and `/observability/scores` return 200
 
+### Iteration 2 — Hackathon Advanced Retrieval Planning (2026-04-14)
+
+- Reviewed current backend retrieval path and Actian SDK examples/docs for:
+  - filtered search
+  - hybrid fusion
+  - named vectors / multimodal
+- Mapped current implementation gaps for hackathon technical compliance.
+- Created implementation blueprint doc:
+  - `agent-docs/hackathon-advanced-search-readme.md`
+- Recommended phased path:
+  1. Filtered search (must-ship)
+  2. Hybrid fusion (recommended)
+  3. Named vectors text+memory (stretch)
+
+### Iteration 3 — Scope Lock: SQLite + Integration Packaging (2026-04-14)
+
+- Confirmed control-plane decision:
+  - Keep SQLite through advanced retrieval implementation and post-feature testing.
+  - Defer Neon/PostgreSQL migration to later deployment/multi-user phase.
+- Confirmed scope simplification:
+  - Skip deployment concerns for this phase.
+- Confirmed integration direction:
+  - Implement filtered + hybrid first.
+  - Decide CLI wrapper vs MCP server after validation.
+
 ### Next Planned Iteration
 
-1. Add KB delete/update endpoints and safer collection lifecycle controls.
-2. Add async ingestion job model (queued/background) for bigger files.
-3. Add improved response grounding with stricter “I don't know” behavior and better source scoring.
+1. Implement `/search/advanced` with payload filter support.
+2. Implement hybrid fusion mode (`RRF`/`DBSF`) in retrieval service.
+3. Add optional named-vector KB creation mode for text+memory split.
+4. Decide integration packaging (CLI wrapper or MCP server) after feature testing.

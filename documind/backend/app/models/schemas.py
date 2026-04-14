@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Literal
 
 from pydantic import BaseModel, Field, model_validator
 
@@ -56,6 +56,68 @@ class QueryRequest(BaseModel):
     top_k: int = 5
     llm_profile: str | None = None
     latency_sensitive: bool = False
+
+
+FilterOperator = Literal["eq", "any_of", "text", "between", "gt", "gte", "lt", "lte"]
+SearchMode = Literal["semantic", "hybrid"]
+HybridMethod = Literal["rrf", "dbsf"]
+
+
+class FilterClause(BaseModel):
+    field: str
+    op: FilterOperator
+    value: Any
+
+
+class FilterSpec(BaseModel):
+    must: list[FilterClause] = Field(default_factory=list)
+    must_not: list[FilterClause] = Field(default_factory=list)
+
+
+class HybridConfig(BaseModel):
+    method: HybridMethod = "rrf"
+    dense_weight: float = Field(default=0.7, ge=0.0)
+    keyword_weight: float = Field(default=0.3, ge=0.0)
+
+    @model_validator(mode="after")
+    def validate_weight_sum(self) -> "HybridConfig":
+        if (self.dense_weight + self.keyword_weight) <= 0:
+            raise ValueError("dense_weight + keyword_weight must be > 0")
+        return self
+
+
+class AdvancedSearchRequest(BaseModel):
+    instance_id: str
+    namespace_id: str = "company_docs"
+    query: str
+    top_k: int = 5
+    mode: SearchMode = "semantic"
+    filters: FilterSpec | None = None
+    hybrid: HybridConfig | None = None
+
+    @model_validator(mode="after")
+    def validate_hybrid(self) -> "AdvancedSearchRequest":
+        if self.mode == "hybrid" and not self.hybrid:
+            raise ValueError("hybrid config is required when mode='hybrid'")
+        return self
+
+
+class AdvancedQueryRequest(BaseModel):
+    instance_id: str
+    namespace_id: str = "company_docs"
+    question: str
+    top_k: int = 5
+    llm_profile: str | None = None
+    latency_sensitive: bool = False
+    mode: SearchMode = "semantic"
+    filters: FilterSpec | None = None
+    hybrid: HybridConfig | None = None
+
+    @model_validator(mode="after")
+    def validate_hybrid(self) -> "AdvancedQueryRequest":
+        if self.mode == "hybrid" and not self.hybrid:
+            raise ValueError("hybrid config is required when mode='hybrid'")
+        return self
 
 
 class InstanceScopedSearchRequest(BaseModel):

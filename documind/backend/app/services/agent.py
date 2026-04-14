@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Any
 
 from app.config import settings
+from app.routing import LLMProfile
 
 
 class AgentService:
@@ -30,12 +31,20 @@ class AgentService:
             f"{context[:2200]}"
         )
 
-    def _openai_answer(self, question: str, context: str) -> str:
+    @staticmethod
+    def _resolve_model_for_profile(profile: LLMProfile) -> str:
+        if profile == LLMProfile.FAST:
+            return settings.llm_fast_model
+        if profile == LLMProfile.QUALITY:
+            return settings.llm_quality_model
+        return settings.llm_balanced_model
+
+    def _openai_answer(self, question: str, context: str, llm_profile: LLMProfile) -> str:
         import openai
 
         client = openai.OpenAI(api_key=self._openai_key)
         response = client.chat.completions.create(
-            model="gpt-4o-mini",
+            model=self._resolve_model_for_profile(llm_profile),
             messages=[
                 {
                     "role": "system",
@@ -54,12 +63,19 @@ class AgentService:
         )
         return response.choices[0].message.content or "I don't know."
 
-    def answer(self, *, question: str, sources: list[dict[str, Any]]) -> str:
+    def answer(
+        self,
+        *,
+        question: str,
+        sources: list[dict[str, Any]],
+        llm_profile: LLMProfile | str | None = None,
+    ) -> str:
         context = self._build_context(sources)
+        profile = LLMProfile(llm_profile) if llm_profile else LLMProfile.BALANCED
         if not self._openai_key:
             return self._local_answer(question, context)
 
         try:
-            return self._openai_answer(question, context)
+            return self._openai_answer(question, context, profile)
         except Exception:
             return self._local_answer(question, context)

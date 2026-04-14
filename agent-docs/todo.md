@@ -99,7 +99,7 @@ Use this checklist at the end of every coding cycle.
 
 ## 4. Phase Tracker
 
-### Phase 1: Backend Foundation (ACTIVE)
+### Phase 1: Backend Foundation + Retrieval Completion (ACTIVE)
 
 - [x] FastAPI app skeleton in `documind/backend/app/`
 - [x] Config + environment wiring
@@ -110,7 +110,25 @@ Use this checklist at the end of every coding cycle.
 - [x] Search/query APIs
 - [x] Basic observability endpoints
 
-### Phase 2: Agent Integration (LOCKED UNTIL PHASE 1 READY)
+### Phase 1.8.5: Advanced Retrieval + Hardening Prep (ACTIVE)
+
+- [x] Add advanced schemas in `documind/backend/app/models/schemas.py`
+  - `FilterClause`, `FilterSpec`, `HybridConfig`
+  - `AdvancedSearchRequest`, `AdvancedQueryRequest`
+- [ ] Add instance-scoped KB resolver for advanced routes (`instance_id + namespace_id -> kb`)
+- [ ] Implement filter translator in `documind/backend/app/services/retrieval.py` (JSON -> Actian `FilterBuilder`)
+- [ ] Implement hybrid fusion mode (`rrf` and optional `dbsf`) in retrieval service
+- [ ] Add advanced instance-scoped routes in `documind/backend/app/routers/query.py`
+  - `POST /search/advanced`
+  - `POST /query/advanced`
+- [ ] Add tests for:
+  - filter translation
+  - hybrid fusion ranking behavior
+  - advanced route payload validation + response shape
+- [ ] Update Postman collection with advanced requests
+- [ ] Update docs (`documind/backend/README.md`, `documind/backend/IMPLEMENTATION_TEST_GUIDE.md`)
+
+### Phase 2: Agent Integration (LOCKED UNTIL PHASE 1.8.5 READY)
 
 - [ ] LangChain agent tooling (`search_docs` etc.)
 - [ ] Prompt augmentation + response generation flow
@@ -122,6 +140,43 @@ Use this checklist at the end of every coding cycle.
 - [ ] Chat UI
 - [ ] Resource ingestion dashboard
 - [ ] Observability panel
+
+---
+
+## 4.1 Phase 1.8.5 Executable Tasks (Single Source of Truth)
+
+Execute in order:
+
+1. `P185-T1` Schema and model wiring
+   - Update `documind/backend/app/models/schemas.py`
+   - Add request models for advanced search/query with instance-scoped target
+   - Completion check: imports succeed and test module discovery still passes
+
+2. `P185-T2` Retrieval filter translator
+   - Update `documind/backend/app/services/retrieval.py`
+   - Build converter from API filter clauses to Actian `FilterBuilder`
+   - Completion check: unit tests for `eq`, `any_of`, `text`, `between`, range ops
+
+3. `P185-T3` Hybrid fusion retrieval
+   - Update `documind/backend/app/services/retrieval.py`
+   - Implement semantic + keyword retrieval and fuse ranks with `rrf` (then `dbsf`)
+   - Completion check: deterministic fusion test for ranking output
+
+4. `P185-T4` Advanced query routes
+   - Update `documind/backend/app/routers/query.py`
+   - Add `POST /search/advanced` and `POST /query/advanced` using `instance_id + namespace_id`
+   - Completion check: route tests pass and no required client `kb_id`
+
+5. `P185-T5` Docs and Postman sync
+   - Update `documind/backend/postman/collection-v1.json`
+   - Update `documind/backend/README.md`
+   - Update `documind/backend/IMPLEMENTATION_TEST_GUIDE.md`
+   - Completion check: Postman examples match route payloads and docs mention no-`kb_id` contract
+
+6. `P185-T6` Verification gate
+   - Run:
+     - `cd documind/backend && .venv/bin/python -m unittest discover -s tests -v`
+   - Completion check: all tests green
 
 ---
 
@@ -208,6 +263,7 @@ uvicorn app.main:app --reload --port 8000
 2. Prisma/PostgreSQL path is not wired yet; this is an intentional deferral for current hackathon scope.
 3. Need richer ingestion support for larger PDFs/URLs and async job processing.
 4. Need stronger scoring (ragas/LLM-judge) instead of placeholder observability values.
+5. Important caveat: enforce uniqueness of `(instance_id, namespace_id)` in control-plane DB to avoid ambiguous KB resolution for instance-scoped APIs.
 
 ---
 
@@ -261,9 +317,19 @@ uvicorn app.main:app --reload --port 8000
   - Implement filtered + hybrid first.
   - Decide CLI wrapper vs MCP server after validation.
 
+### Iteration 4 — No-`kb_id` Client Contract + Planning Sync (2026-04-14)
+
+- Implemented client-facing no-`kb_id` flows using `instance_id + namespace_id`:
+  - `/resources` ingest + list
+  - `/search/instance` and `/query/instance`
+- Added KB auto-create path during ingestion for missing namespace KB.
+- Refined `documind/backend/ADVANCED_RETRIEVAL_README.md` to use instance-scoped payloads.
+- Converted Phase 1.8.5 plan into executable tasks in this file as single source of truth.
+- Recorded DB uniqueness caveat for `(instance_id, namespace_id)` under open risks.
+
 ### Next Planned Iteration
 
-1. Implement `/search/advanced` with payload filter support.
-2. Implement hybrid fusion mode (`RRF`/`DBSF`) in retrieval service.
-3. Add optional named-vector KB creation mode for text+memory split.
-4. Decide integration packaging (CLI wrapper or MCP server) after feature testing.
+1. Execute `P185-T1` to `P185-T3` (schemas + filters + hybrid core).
+2. Execute `P185-T4` and `P185-T5` (advanced routes + Postman/docs sync).
+3. Run `P185-T6` verification gate and mark Phase 1.8.5 checkboxes.
+4. Re-evaluate integration packaging (CLI wrapper vs MCP server) after advanced retrieval validation.

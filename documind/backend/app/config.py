@@ -21,6 +21,9 @@ class Settings:
 
     default_embedding_model: str = os.getenv("DEFAULT_EMBEDDING_MODEL", "minilm")
     openai_api_key: str | None = os.getenv("OPENAI_API_KEY") or os.getenv("OPENAI_KEY")
+    llm_fast_model: str = os.getenv("LLM_FAST_MODEL", "gpt-4o-mini")
+    llm_balanced_model: str = os.getenv("LLM_BALANCED_MODEL", "gpt-4o-mini")
+    llm_quality_model: str = os.getenv("LLM_QUALITY_MODEL", "gpt-4o")
 
     control_db_provider: str = os.getenv("CONTROL_DB_PROVIDER", "sqlite")
     sqlite_path: str = os.getenv("SQLITE_PATH", str(BASE_DIR / "documind.db"))

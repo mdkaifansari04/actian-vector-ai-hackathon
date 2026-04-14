@@ -24,6 +24,17 @@ class SQLiteControlPlaneStore:
         conn.row_factory = sqlite3.Row
         return conn
 
+    @staticmethod
+    def _existing_columns(cur: sqlite3.Cursor, table: str) -> set[str]:
+        rows = cur.execute(f"PRAGMA table_info({table})").fetchall()
+        return {str(row[1]) for row in rows}
+
+    @classmethod
+    def _ensure_column(cls, cur: sqlite3.Cursor, table: str, column: str, ddl: str) -> None:
+        if column in cls._existing_columns(cur, table):
+            return
+        cur.execute(f"ALTER TABLE {table} ADD COLUMN {column} {ddl}")
+
     def initialize(self) -> None:
         with self._lock:
             conn = self._connect()
@@ -49,7 +60,9 @@ class SQLiteControlPlaneStore:
                         namespace_id TEXT NOT NULL,
                         collection_name TEXT NOT NULL UNIQUE,
                         embedding_model TEXT NOT NULL,
+                        embedding_profile TEXT NOT NULL DEFAULT 'general_text_search',
                         embedding_dim INTEGER NOT NULL,
+                        llm_profile TEXT NOT NULL DEFAULT 'balanced',
                         distance_metric TEXT NOT NULL,
                         status TEXT NOT NULL,
                         created_at TEXT NOT NULL,
@@ -57,6 +70,18 @@ class SQLiteControlPlaneStore:
                         FOREIGN KEY(instance_id) REFERENCES instances(id)
                     )
                     """
+                )
+                self._ensure_column(
+                    cur,
+                    "knowledge_bases",
+                    "embedding_profile",
+                    "TEXT NOT NULL DEFAULT 'general_text_search'",
+                )
+                self._ensure_column(
+                    cur,
+                    "knowledge_bases",
+                    "llm_profile",
+                    "TEXT NOT NULL DEFAULT 'balanced'",
                 )
                 cur.execute("CREATE INDEX IF NOT EXISTS idx_kb_instance ON knowledge_bases(instance_id)")
                 cur.execute("CREATE INDEX IF NOT EXISTS idx_kb_namespace ON knowledge_bases(namespace_id)")
@@ -143,7 +168,9 @@ class SQLiteControlPlaneStore:
         namespace_id: str,
         collection_name: str,
         embedding_model: str,
+        embedding_profile: str,
         embedding_dim: int,
+        llm_profile: str,
         distance_metric: str,
         status: str = "active",
         kb_id: str | None = None,
@@ -156,8 +183,8 @@ class SQLiteControlPlaneStore:
                 conn.execute(
                     """
                     INSERT INTO knowledge_bases
-                    (id, instance_id, name, namespace_id, collection_name, embedding_model, embedding_dim, distance_metric, status, created_at, updated_at)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    (id, instance_id, name, namespace_id, collection_name, embedding_model, embedding_profile, embedding_dim, llm_profile, distance_metric, status, created_at, updated_at)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     """,
                     (
                         kb_id,
@@ -166,7 +193,9 @@ class SQLiteControlPlaneStore:
                         namespace_id,
                         collection_name,
                         embedding_model,
+                        embedding_profile,
                         embedding_dim,
+                        llm_profile,
                         distance_metric,
                         status,
                         now,

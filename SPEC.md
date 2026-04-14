@@ -131,9 +131,21 @@ This pattern is known as **Retrieval-Augmented Generation (RAG)**, and DocuMind 
 
 ### Embedding Model
 
-- **OpenAI `text-embedding-ada-002`** or **`text-embedding-3-small`**
-  - Converts text chunks into high-dimensional vector embeddings
-  - Alternative: HuggingFace `sentence-transformers/all-MiniLM-L6-v2` for open-source option
+- The system supports an explicit embedding profile registry so model choice is tied to use case:
+  - **General text search (default):** `sentence-transformers/all-MiniLM-L6-v2`
+    - Fast, lightweight baseline for most document retrieval workloads
+  - **Higher quality text retrieval:** `sentence-transformers/all-mpnet-base-v2`
+    - Better retrieval quality at higher latency/cost than MiniLM
+  - **Quality/speed balance:** `BAAI/bge-small-en-v1.5`
+    - Good compromise between quality and runtime efficiency
+  - **Multimodal retrieval (image + text):** `openai/clip-vit-base-patch32`
+    - Use when image-text semantic search is required
+  - **Code search:** `microsoft/codebert-base`
+    - Use for source code and technical snippet retrieval
+- Implementation rules:
+  - Each collection must store `embedding_profile` and resolved `embedding_dim`.
+  - Query-time embedding must always use the same profile as ingestion-time embedding.
+  - Do not mix different embedding profiles in the same vector field; use separate collections or named vectors for A/B tests.
 
 ### AI Agent Framework
 
@@ -211,6 +223,16 @@ Responsible for taking raw documentation and storing it as searchable vectors in
 - `conversation_memory` uses a dedicated memory-oriented embedding/index configuration (independent from general docs).
 - The interface should default to `conversation_memory` when `source_type` is conversation history.
 - Users should be able to override this routing explicitly before indexing.
+- In addition to index profile, every ingestion request should allow selecting an `embedding_profile` (with safe defaults):
+  - `general_text_search` → `sentence-transformers/all-MiniLM-L6-v2` (default for general docs)
+  - `higher_quality_text` → `sentence-transformers/all-mpnet-base-v2`
+  - `balanced_text` → `BAAI/bge-small-en-v1.5`
+  - `multimodal_text_image` → `openai/clip-vit-base-patch32`
+  - `code_search` → `microsoft/codebert-base`
+- Auto-default routing behavior:
+  - If source is standard docs (`.md`, `.txt`, `.pdf`, URL text): default to `general_text_search`.
+  - If source is code-heavy docs/snippets/repos: default to `code_search`.
+  - If source contains both images and text for retrieval: default to `multimodal_text_image`.
 
 **Chunking strategy:**
 
@@ -221,7 +243,7 @@ Document (10,000 words)
 [Chunk 1: 512 tokens] [Chunk 2: 512 tokens] ... [Chunk N: 512 tokens]
        │
        ▼
-[Vector Embedding: 1536-dim float array]
+[Vector Embedding: model-dependent float array (e.g., 384 / 512 / 768)]
        │
        ▼
 [Stored in Actian with metadata]
@@ -808,7 +830,7 @@ Update observability thresholds and alert channels.
 ### Challenge 2: Embedding Model Consistency
 
 - **Problem:** Embeddings used at ingestion must match those used at query time.
-- **Solution:** Lock the embedding model in a config file. Never mix models in the same collection.
+- **Solution:** Lock an `embedding_profile` per collection (`general_text_search`, `higher_quality_text`, `balanced_text`, `multimodal_text_image`, `code_search`) and persist resolved dimension. Never mix profiles in the same vector field.
 
 ### Challenge 3: Latency
 

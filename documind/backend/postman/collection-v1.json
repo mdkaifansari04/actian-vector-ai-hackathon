@@ -1,0 +1,508 @@
+{
+  "info": {
+    "_postman_id": "ec425992-033b-4c1e-9f72-f97398c855d3",
+    "name": "DocuMind Backend v1",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Phase 1 Flow",
+      "item": [
+        {
+          "name": "health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/health",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "health"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "create-instance",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const body = pm.response.json();",
+                  "  if (body.id) pm.collectionVariables.set('instance_id', body.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Acme Corp\",\n  \"description\": \"Manual QA instance\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/instances",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "instances"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "create-knowledge-base",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const body = pm.response.json();",
+                  "  if (body.id) pm.collectionVariables.set('kb_id', body.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"instance_id\": \"{{instance_id}}\",\n  \"name\": \"Engineering Docs\",\n  \"namespace_id\": \"{{namespace_id}}\",\n  \"embedding_model\": \"minilm\",\n  \"distance_metric\": \"cosine\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/knowledge-bases",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "knowledge-bases"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "ingest-resource-json-instance-scope",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const body = pm.response.json();",
+                  "  if (body.kb_id) pm.collectionVariables.set('kb_id', body.kb_id);",
+                  "  if (body.resource_id) pm.collectionVariables.set('resource_id', body.resource_id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"instance_id\": \"{{instance_id}}\",\n  \"namespace_id\": \"{{namespace_id}}\",\n  \"source_type\": \"text\",\n  \"content\": \"Payments deploy flow: push main, CI builds image, release to prod.\",\n  \"source_ref\": \"deploy-notes.txt\",\n  \"user_id\": \"user_123\",\n  \"session_id\": \"sess_001\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/resources",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "resources"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "ingest-resource-json-kb-scope-legacy",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"kb_id\": \"{{kb_id}}\",\n  \"source_type\": \"markdown\",\n  \"content\": \"# Deploy Notes\\n1. Merge to main\\n2. Wait for CI\\n3. Release\",\n  \"source_ref\": \"deploy-notes.md\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/resources",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "resources"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "ingest-resource-formdata-file",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "instance_id",
+                  "value": "{{instance_id}}",
+                  "type": "text"
+                },
+                {
+                  "key": "namespace_id",
+                  "value": "{{namespace_id}}",
+                  "type": "text"
+                },
+                {
+                  "key": "source_type",
+                  "value": "markdown",
+                  "type": "text"
+                },
+                {
+                  "key": "source_ref",
+                  "value": "notes.md",
+                  "type": "text"
+                },
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": ""
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/resources",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "resources"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "list-resources-instance-scope",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/resources?instance_id={{instance_id}}&namespace_id={{namespace_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "resources"
+              ],
+              "query": [
+                {
+                  "key": "instance_id",
+                  "value": "{{instance_id}}"
+                },
+                {
+                  "key": "namespace_id",
+                  "value": "{{namespace_id}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "list-resources-kb-scope-legacy",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/resources?kb_id={{kb_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "resources"
+              ],
+              "query": [
+                {
+                  "key": "kb_id",
+                  "value": "{{kb_id}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "search-instance-scope",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"instance_id\": \"{{instance_id}}\",\n  \"namespace_id\": \"{{namespace_id}}\",\n  \"query\": \"how do we deploy payments service\",\n  \"top_k\": 3\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/search/instance",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "search",
+                "instance"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "query-instance-scope",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"instance_id\": \"{{instance_id}}\",\n  \"namespace_id\": \"{{namespace_id}}\",\n  \"question\": \"How do we deploy the payments service?\",\n  \"top_k\": 3\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/query/instance",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "query",
+                "instance"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "search-kb-scope-legacy",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"kb_id\": \"{{kb_id}}\",\n  \"query\": \"how do we deploy payments service\",\n  \"top_k\": 3\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/search",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "search"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "query-kb-scope-legacy",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"kb_id\": \"{{kb_id}}\",\n  \"question\": \"How do we deploy the payments service?\",\n  \"top_k\": 3\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/query",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "query"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Debug",
+      "item": [
+        {
+          "name": "list-knowledge-bases",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/knowledge-bases?instance_id={{instance_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "knowledge-bases"
+              ],
+              "query": [
+                {
+                  "key": "instance_id",
+                  "value": "{{instance_id}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "collections",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/collections",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "collections"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000"
+    },
+    {
+      "key": "instance_id",
+      "value": ""
+    },
+    {
+      "key": "namespace_id",
+      "value": "company_docs"
+    },
+    {
+      "key": "kb_id",
+      "value": ""
+    },
+    {
+      "key": "resource_id",
+      "value": ""
+    }
+  ]
+}

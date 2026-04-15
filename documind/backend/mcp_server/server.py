@@ -25,7 +25,8 @@ def build_mcp_server():
         "DocuMind",
         instructions=(
             "Use DocuMind tools to search and query internal documentation. "
-            "Prefer search_docs for lookup."
+            "Use search_docs first for factual lookup (counts, lists, exact values). "
+            "Use ask_docs only for synthesis."
         ),
     )
 
@@ -38,6 +39,32 @@ def build_mcp_server():
             namespace_id=namespace_id,
             top_k=top_k,
         )
+
+    @mcp.tool()
+    def ask_docs(question: str, instance_id: str, namespace_id: str, top_k: int = 5) -> dict[str, Any]:
+        """Use for synthesized grounded answers. Prefer search_docs for exact lookup/counting."""
+        return service.ask_docs(
+            question=question,
+            instance_id=instance_id,
+            namespace_id=namespace_id,
+            top_k=top_k,
+        )
+
+    @mcp.tool()
+    def ingest_text(content: str, instance_id: str, namespace_id: str, source_ref: str = "inline") -> dict[str, Any]:
+        """Ingest plain text/markdown content into a target namespace."""
+        return service.ingest_text(
+            content=content,
+            instance_id=instance_id,
+            namespace_id=namespace_id,
+            source_ref=source_ref,
+        )
+
+    @mcp.tool()
+    def list_knowledge_bases(instance_id: str = "") -> dict[str, Any]:
+        """List available knowledge bases, optionally scoped to one instance."""
+        resolved_instance_id = instance_id.strip() or None
+        return service.list_knowledge_bases(instance_id=resolved_instance_id)
 
     return mcp
 

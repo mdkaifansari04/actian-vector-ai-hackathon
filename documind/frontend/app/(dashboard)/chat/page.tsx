@@ -62,6 +62,13 @@ function generateId() {
   return Math.random().toString(36).substring(2, 15)
 }
 
+const checkboxClassName =
+  'h-4 w-4 border-white/40 bg-black/50 data-[state=checked]:border-violet-300/80 data-[state=checked]:bg-violet-300/80 data-[state=checked]:text-black'
+const switchClassName =
+  'border-white/15 data-[state=unchecked]:bg-white/12 data-[state=checked]:bg-violet-400/45'
+const sliderClassName =
+  '[&_[data-slot=slider-track]]:bg-white/10 [&_[data-slot=slider-range]]:bg-violet-300/60 [&_[data-slot=slider-thumb]]:border-white/25 [&_[data-slot=slider-thumb]]:bg-white [&_[data-slot=slider-thumb]]:size-3.5'
+
 export default function ChatWorkspacePage() {
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
@@ -321,6 +328,7 @@ export default function ChatWorkspacePage() {
                           All
                         </span>
                         <Switch
+                          className={switchClassName}
                           checked={allNamespaces}
                           onCheckedChange={(checked) => {
                             setAllNamespaces(checked)
@@ -345,6 +353,7 @@ export default function ChatWorkspacePage() {
                           )}
                         >
                           <Checkbox
+                            className={checkboxClassName}
                             checked={
                               allNamespaces ||
                               selectedNamespaces.includes(namespace)
@@ -382,6 +391,7 @@ export default function ChatWorkspacePage() {
                           )}
                         >
                           <Checkbox
+                            className={checkboxClassName}
                             checked={selectedKbs.includes(kb.id)}
                             onCheckedChange={() => toggleKb(kb.id)}
                           />
@@ -407,6 +417,7 @@ export default function ChatWorkspacePage() {
                         Advanced Retrieval
                       </span>
                       <Switch
+                        className={switchClassName}
                         checked={useAdvanced}
                         onCheckedChange={setUseAdvanced}
                       />
@@ -419,6 +430,7 @@ export default function ChatWorkspacePage() {
                         </span>
                       </div>
                       <Slider
+                        className={sliderClassName}
                         value={[topK]}
                         onValueChange={([v]) => setTopK(v)}
                         min={1}
@@ -589,7 +601,9 @@ export default function ChatWorkspacePage() {
                           <Trash2 className="h-3.5 w-3.5" strokeWidth={1.5} />
                         </Button>
                       </TooltipTrigger>
-                      <TooltipContent>Clear chat</TooltipContent>
+                      <TooltipContent className="rounded-md border border-white/8 bg-[#1a1a1a] px-2 py-1 text-[11px] text-white/80">
+                        Clear chat
+                      </TooltipContent>
                     </Tooltip>
                   )}
                 </div>

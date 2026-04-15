@@ -84,6 +84,12 @@ INSTANCE_ID=$(curl -sS -X POST http://localhost:8000/instances \
 echo "INSTANCE_ID=${INSTANCE_ID}"
 ```
 
+If the above one-liner fails in your shell, use CLI:
+
+```bash
+./run_documind_cli.sh instance-create --name "Phase2 Test Instance" --description "Complete testing run"
+```
+
 Ingest baseline docs:
 
 ```bash
@@ -301,12 +307,13 @@ export DOCUMIND_API_URL="http://localhost:8000"
 ### 6.3 MCP test prompts
 
 1. `Call get_active_context.`
-2. `If context is missing, call list_instances and list_namespaces for <INSTANCE_ID>, then call set_active_context with instance_id=<INSTANCE_ID> and namespace_id=company_docs.`
-3. `Call search_docs for query "deploy payments command", top_k 5.` (without ids, should use context)
-4. `Call ask_docs for question "What is the deploy command?"` (without ids, should use context)
-5. `Call ingest_text with source_ref "patch.md" and content "Patch command is npm run patch". Then call search_docs for query "patch command".`
-6. `Switch context by calling set_active_context with namespace_id=ops, then call get_active_context and confirm namespace changed.`
-7. `Call search_docs with namespace_id does-not-exist and verify structured error response.`
+2. `If no instances exist, call create_instance with name "Phase2 Test Instance".`
+3. `Call list_instances and list_namespaces for <INSTANCE_ID>, then call set_active_context with instance_id=<INSTANCE_ID> and namespace_id=company_docs.`
+4. `Call search_docs for query "deploy payments command", top_k 5.` (without ids, should use context)
+5. `Call ask_docs for question "What is the deploy command?"` (without ids, should use context)
+6. `Call ingest_text with source_ref "patch.md" and content "Patch command is npm run patch". Then call search_docs for query "patch command".`
+7. `Switch context by calling set_active_context with namespace_id=ops, then call get_active_context and confirm namespace changed.`
+8. `Call search_docs with namespace_id does-not-exist and verify structured error response.`
 
 Expected:
 - same envelope shape as CLI.

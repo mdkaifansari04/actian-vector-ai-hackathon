@@ -474,9 +474,38 @@ These are non-blocking but high-value improvements for reliability and observabi
   - `docs/steps/phase-two-testing-runbook.md` with CLI-first testing commands.
   - `docs/steps/phase-two-todo.md` marks `P2-T6` complete.
 
+### Iteration 11 — Context-Aware UX (CLI + MCP) + Coverage (2026-04-15)
+
+- Added persistent active context store shared by CLI + MCP:
+  - `documind/backend/mcp_server/context_store.py`
+  - default storage path: `~/.documind/contexts.json`
+  - context contract: `context_id -> instance_id + namespace_id`
+- Extended MCP service with context-aware behavior:
+  - new methods: `get_active_context`, `set_active_context`, `list_instances`, `list_namespaces`
+  - `search_docs`, `ask_docs`, `ingest_text` now accept optional `instance_id/namespace_id` and resolve via active context when omitted
+  - context-missing responses return structured `validation_error` with:
+    - `reason=context_missing`
+    - `action_required=set_active_context`
+- Extended MCP tool surface in server entrypoint:
+  - added tools: `get_active_context`, `set_active_context`, `list_instances`, `create_instance`, `list_namespaces`
+  - updated tool docs/instructions for context-first flow
+- Extended CLI for first-time + switching UX:
+  - global `--context-id`
+  - new commands: `instances`, `instance-create`, `namespaces`, `context-show`, `context-set`
+  - existing commands now support context fallback when IDs are omitted
+- Added/expanded tests:
+  - `tests/test_context_store.py`
+  - updated `tests/test_mcp_search_tool.py` for context resolution/tooling
+  - updated `tests/test_documind_cli.py` for context commands and propagation
+- Verification:
+  - full backend test suite passed (`50` tests)
+  - CLI and MCP startup/help flows validated after changes
+- Updated docs:
+  - `docs/steps/phase-two-testing-runbook.md` now includes first-time context setup and MCP context-switch prompts
+  - `docs/steps/phase-two-todo.md` now marks `P2-T7` and `P2-T8` complete
+
 ### Next Planned Iteration
 
-1. Execute `P2-T7` and `P2-T8` from `docs/steps/phase-two-todo.md`.
-2. Add integration-style smoke checks for MCP tool calls against running backend.
-3. Expand docs with final CLI + MCP side-by-side usage examples.
-4. Keep implementation hackathon-scoped (no production hardening extras in this phase).
+1. Execute `P2-GATE` verification from `docs/steps/phase-two-todo.md`.
+2. Run one live Codex MCP smoke session with context-set -> search/ask -> context switch flow.
+3. Capture user feedback from runbook template and close Phase 2 tracker.

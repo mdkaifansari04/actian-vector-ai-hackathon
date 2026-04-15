@@ -434,9 +434,30 @@ These are non-blocking but high-value improvements for reliability and observabi
 - Verified no regression in prebuilt backend behavior:
   - full backend test suite passed after changes.
 
+### Iteration 9 — Phase 2 Progress: `ask_docs` + ingest/list + envelope (2026-04-15)
+
+- Implemented `ask_docs` tool in MCP service with fast-first behavior:
+  - primary `POST /query/instance`
+  - one fallback `POST /query/advanced` (`mode=hybrid`) when primary response is not useful.
+- Implemented remaining tools:
+  - `ingest_text` -> `POST /resources`
+  - `list_knowledge_bases` -> `GET /knowledge-bases` (optional `instance_id`)
+- Added MCP server tool registration for all four tools:
+  - `search_docs`, `ask_docs`, `ingest_text`, `list_knowledge_bases`
+- Implemented/validated stable response envelope and error mapping layer:
+  - envelope keys: `status`, `data`, `meta`, optional `text`
+  - error enums: `not_found`, `validation_error`, `timeout`, `server_error`
+- Expanded MCP tests in `documind/backend/tests/test_mcp_search_tool.py` to cover:
+  - `ask_docs` primary + fallback
+  - `ingest_text` success path
+  - `list_knowledge_bases` success path
+  - existing `search_docs` paths still passing
+- Verified no regressions:
+  - full backend test suite passed after Phase 2 changes.
+
 ### Next Planned Iteration
 
-1. Execute `P2-T3` and `P2-T4` from `docs/steps/phase-two-todo.md`.
-2. Implement `ask_docs`, `ingest_text`, and `list_knowledge_bases` tools in MCP service.
-3. Add CLI wrapper commands for same contract surface.
+1. Execute `P2-T6` and `P2-T7` from `docs/steps/phase-two-todo.md`.
+2. Add CLI wrapper commands for same contract surface.
+3. Add integration-style smoke checks for MCP tool calls against running backend.
 4. Keep implementation hackathon-scoped (no production hardening extras in this phase).

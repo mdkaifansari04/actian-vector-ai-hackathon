@@ -19,17 +19,17 @@ Rule: mark `[x]` only after code + tests + docs for that task are done.
   - Enforce `instance_id + namespace_id` and `top_k <= 20`.
   - Done when: tool returns stable JSON envelope and fallback behavior is tested.
 
-- [ ] `P2-T3` Implement `ask_docs` tool (fast-first flow)
+- [x] `P2-T3` Implement `ask_docs` tool (fast-first flow)
   - Primary call: `/query/instance`
   - One fallback: `/query/advanced` with `mode="hybrid"` when needed.
   - Done when: tool returns answer + sources with stable JSON envelope.
 
-- [ ] `P2-T4` Implement `ingest_text` and `list_knowledge_bases` tools
+- [x] `P2-T4` Implement `ingest_text` and `list_knowledge_bases` tools
   - `ingest_text` uses `/resources` JSON path.
   - `list_knowledge_bases` supports optional `instance_id` filter.
   - Done when: both tools return JSON envelope with consistent error mapping.
 
-- [ ] `P2-T5` Add tool response schema + error mapping layer
+- [x] `P2-T5` Add tool response schema + error mapping layer
   - Response envelope:
     - `status`, `data`, `meta`, optional `text`
   - Error enums:

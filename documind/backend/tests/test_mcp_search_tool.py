@@ -5,6 +5,43 @@ import unittest
 from mcp_server.service import DocuMindMCPService, MCPTimeouts
 
 
+class FakeContextStore:
+    def __init__(self):
+        self._contexts: dict[str, dict] = {}
+
+    def get(self, context_id: str):
+        row = self._contexts.get(context_id)
+        if not row:
+            return None
+
+        class _Active:
+            def __init__(self, payload: dict):
+                self.context_id = payload["context_id"]
+                self.instance_id = payload["instance_id"]
+                self.namespace_id = payload["namespace_id"]
+                self.updated_at = payload["updated_at"]
+
+            def as_dict(self):
+                return {
+                    "context_id": self.context_id,
+                    "instance_id": self.instance_id,
+                    "namespace_id": self.namespace_id,
+                    "updated_at": self.updated_at,
+                }
+
+        return _Active(row)
+
+    def set(self, *, context_id: str, instance_id: str, namespace_id: str):
+        payload = {
+            "context_id": context_id,
+            "instance_id": instance_id,
+            "namespace_id": namespace_id,
+            "updated_at": "2026-04-15T00:00:00",
+        }
+        self._contexts[context_id] = payload
+        return self.get(context_id)
+
+
 class FakeAPIClient:
     def __init__(self, post_responses=None, get_responses=None):
         self._post_responses = list(post_responses or [])
@@ -229,6 +266,89 @@ class MCPToolOtherTests(unittest.TestCase):
         self.assertEqual(params["instance_id"], "inst-1")
         self.assertEqual(timeout, 8)
         self.assertEqual(len(result["data"]["knowledge_bases"]), 2)
+
+    def test_search_docs_uses_active_context_when_ids_missing(self) -> None:
+        fake_client = FakeAPIClient(
+            post_responses=[(200, {"results": [{"id": 1, "text": "x", "score": 0.9, "source_ref": "a.md"}]})]
+        )
+        context_store = FakeContextStore()
+        context_store.set(context_id="default", instance_id="inst-ctx", namespace_id="ns-ctx")
+        service = DocuMindMCPService(
+            api_client=fake_client,
+            timeouts=self.timeouts,
+            context_store=context_store,
+            default_context_id="default",
+        )
+
+        result = service.search_docs(query="deploy")
+
+        self.assertEqual(result["status"], "success")
+        self.assertTrue(result["meta"]["context_used"])
+        _, payload, _ = fake_client.post_calls[0]
+        self.assertEqual(payload["instance_id"], "inst-ctx")
+        self.assertEqual(payload["namespace_id"], "ns-ctx")
+
+    def test_search_docs_errors_when_context_missing_and_ids_missing(self) -> None:
+        fake_client = FakeAPIClient()
+        service = DocuMindMCPService(
+            api_client=fake_client,
+            timeouts=self.timeouts,
+            context_store=FakeContextStore(),
+            default_context_id="default",
+        )
+
+        result = service.search_docs(query="deploy")
+
+        self.assertEqual(result["status"], "error")
+        self.assertEqual(result["meta"]["error"], "validation_error")
+        self.assertEqual(result["meta"]["reason"], "context_missing")
+        self.assertEqual(result["meta"]["action_required"], "set_active_context")
+
+    def test_set_and_get_active_context(self) -> None:
+        fake_client = FakeAPIClient(
+            get_responses=[
+                (200, {"data": [{"id": "inst-1", "name": "A"}]}),
+                (200, {"data": [{"id": "kb-1", "namespace_id": "company_docs"}]}),
+            ]
+        )
+        context_store = FakeContextStore()
+        service = DocuMindMCPService(
+            api_client=fake_client,
+            timeouts=self.timeouts,
+            context_store=context_store,
+            default_context_id="default",
+        )
+
+        set_result = service.set_active_context(instance_id="inst-1", namespace_id="company_docs")
+        get_result = service.get_active_context()
+
+        self.assertEqual(set_result["status"], "success")
+        self.assertTrue(set_result["data"]["namespace_known"])
+        self.assertEqual(get_result["status"], "success")
+        self.assertEqual(get_result["data"]["instance_id"], "inst-1")
+        self.assertEqual(get_result["data"]["namespace_id"], "company_docs")
+
+    def test_list_namespaces_from_context(self) -> None:
+        fake_client = FakeAPIClient(
+            get_responses=[
+                (200, {"data": [{"id": "kb-1", "namespace_id": "company_docs"}, {"id": "kb-2", "namespace_id": "ops"}]}),
+            ]
+        )
+        context_store = FakeContextStore()
+        context_store.set(context_id="default", instance_id="inst-1", namespace_id="company_docs")
+        service = DocuMindMCPService(
+            api_client=fake_client,
+            timeouts=self.timeouts,
+            context_store=context_store,
+            default_context_id="default",
+        )
+
+        result = service.list_namespaces()
+
+        self.assertEqual(result["status"], "success")
+        self.assertEqual(result["meta"]["instance_id"], "inst-1")
+        self.assertTrue(result["meta"]["context_used"])
+        self.assertEqual(result["data"]["namespaces"], ["company_docs", "ops"])
 
 
 if __name__ == "__main__":

@@ -8,12 +8,12 @@ Rule: mark `[x]` only after code + tests + docs for that task are done.
 
 ## Execution Checklist
 
-- [ ] `P2-T1` Scaffold MCP adapter package
+- [x] `P2-T1` Scaffold MCP adapter package
   - Create `documind/backend/mcp_server/` with runnable server entrypoint.
   - Add config/env wiring for backend API URL and timeouts.
   - Done when: MCP server process starts locally without errors.
 
-- [ ] `P2-T2` Implement `search_docs` tool (fast-first flow)
+- [x] `P2-T2` Implement `search_docs` tool (fast-first flow)
   - Primary call: `/search/instance`
   - One fallback: `/search/advanced` with `mode="hybrid"` when needed.
   - Enforce `instance_id + namespace_id` and `top_k <= 20`.

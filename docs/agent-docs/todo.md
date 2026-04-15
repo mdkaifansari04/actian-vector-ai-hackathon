@@ -416,9 +416,27 @@ These are non-blocking but high-value improvements for reliability and observabi
   - `phase-two-todo.md` (single execution checklist).
 - Updated this living tracker Phase 2 status from "READY, NOT STARTED" to "IN PROGRESS".
 
+### Iteration 8 — Phase 2 Start: MCP Scaffold + `search_docs` (2026-04-15)
+
+- Added MCP server scaffold under `documind/backend/mcp_server/`:
+  - `server.py` (FastMCP entrypoint + tool registration)
+  - `config.py` (env/timeouts)
+  - `client.py` (HTTP wrapper to backend API)
+  - `service.py` (tool behavior + response envelope/error mapping)
+- Implemented `search_docs` fast-first behavior:
+  - primary `POST /search/instance`
+  - one fallback `POST /search/advanced` (`mode=hybrid`) when primary returns empty results
+  - enforced `instance_id + namespace_id` and `top_k` cap (`<=20`)
+- Added tests:
+  - `documind/backend/tests/test_mcp_search_tool.py`
+  - covers top_k cap, fallback path, and `not_found` error mapping
+- Verified MCP server process startup locally in stdio mode.
+- Verified no regression in prebuilt backend behavior:
+  - full backend test suite passed after changes.
+
 ### Next Planned Iteration
 
-1. Execute `P2-T1` and `P2-T2` from `docs/steps/phase-two-todo.md`.
-2. Add MCP server scaffold + `search_docs` tool with fast-first fallback flow.
-3. Add initial tests for tool response envelope and fallback branch.
+1. Execute `P2-T3` and `P2-T4` from `docs/steps/phase-two-todo.md`.
+2. Implement `ask_docs`, `ingest_text`, and `list_knowledge_bases` tools in MCP service.
+3. Add CLI wrapper commands for same contract surface.
 4. Keep implementation hackathon-scoped (no production hardening extras in this phase).

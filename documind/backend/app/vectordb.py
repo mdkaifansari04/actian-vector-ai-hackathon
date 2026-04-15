@@ -19,7 +19,16 @@ class VectorDBClient:
         self._url = url or settings.vectordb_url
 
     def _client(self) -> VectorAIClient:
-        return VectorAIClient(self._url)
+        grpc_options = [
+            ("grpc.keepalive_time_ms", settings.vectordb_keepalive_time_ms),
+            ("grpc.keepalive_timeout_ms", settings.vectordb_keepalive_timeout_ms),
+            (
+                "grpc.keepalive_permit_without_calls",
+                int(settings.vectordb_keepalive_permit_without_calls),
+            ),
+            ("grpc.http2.max_pings_without_data", settings.vectordb_max_pings_without_data),
+        ]
+        return VectorAIClient(self._url, grpc_options=grpc_options)
 
     def health_check(self) -> dict[str, Any]:
         with self._client() as client:

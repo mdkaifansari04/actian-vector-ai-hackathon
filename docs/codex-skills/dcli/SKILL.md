@@ -315,7 +315,20 @@ Avoid asking:
 If any `dcli` call returns `status="error"`:
 - stop the workflow immediately
 - show the error `text` and relevant `meta` to user
-- ask user for correction/confirmation (for example: wrong context, missing namespace, backend down)
+- diagnose likely cause before asking:
+  - missing/incorrect context-id
+  - missing namespace
+  - missing instance selection
+  - backend connectivity/env issues
+
+Recovery sequence (DCLI-only):
+1. Re-check context with project context-id.
+2. If context invalid/missing, list instances.
+3. Ask user to choose instance by name (or create one).
+4. List namespaces for selected instance.
+5. Ask user to choose namespace.
+6. Set context and confirm.
+7. Retry original `dcli` command once.
 
 Do not do:
 - do not silently retry with MCP DocuMind tools (`documind.*`)

@@ -196,6 +196,29 @@ Notes:
 - Ask Codex explicitly to use `dcli-documind skill`.
 - Ask for JSON explicitly so it uses `--bot=true`.
 
+### 9.1 Top Session Prompt (Recommended)
+
+Use this once at the start of each Codex session:
+
+```text
+Use dcli-documind skill.
+Hard rules:
+1) Use DCLI as primary toolchain. Use --bot=true for all dcli calls.
+2) Use project context-id = repo slug for every dcli call.
+3) If any dcli call returns status=error:
+   - stop and diagnose missing params/context first
+   - run only DCLI context-repair flow:
+     a) context-show
+     b) instances
+     c) ask me to choose instance by name
+     d) namespaces for selected instance
+     e) ask me to choose namespace
+     f) context-set + context-show
+   - retry the original dcli command once
+4) Do NOT fallback to documind MCP tools automatically.
+5) Do NOT ask me for random IDs unless duplicate names require disambiguation.
+```
+
 ## 10) Troubleshooting
 
 `dcli: command not found`

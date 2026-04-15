@@ -455,9 +455,28 @@ These are non-blocking but high-value improvements for reliability and observabi
 - Verified no regressions:
   - full backend test suite passed after Phase 2 changes.
 
+### Iteration 10 — CLI-First Delivery + Latency Guardrails (2026-04-15)
+
+- Implemented CLI wrapper module:
+  - `documind/backend/documind_cli.py`
+  - commands: `search-docs`, `ask-docs`, `ingest-text`, `list-kbs`
+  - contract preserved: `instance_id + namespace_id` primary targeting.
+- Added CLI launcher script:
+  - `documind/backend/run_documind_cli.sh`
+- Added CLI tests:
+  - `documind/backend/tests/test_documind_cli.py`
+  - verifies command dispatch, ingest-from-file, 200KB cap, and exit code behavior.
+- Added hackathon speed/safety updates:
+  - MCP ask path now requests `llm_profile=fast` + `latency_sensitive=true`.
+  - OpenAI client timeout configurable via `OPENAI_TIMEOUT_SECONDS` (default `10`).
+  - VectorDB gRPC keepalive tuned to reduce `too_many_pings` (`ENHANCE_YOUR_CALM`) events.
+- Updated docs:
+  - `docs/steps/phase-two-testing-runbook.md` with CLI-first testing commands.
+  - `docs/steps/phase-two-todo.md` marks `P2-T6` complete.
+
 ### Next Planned Iteration
 
-1. Execute `P2-T6` and `P2-T7` from `docs/steps/phase-two-todo.md`.
-2. Add CLI wrapper commands for same contract surface.
-3. Add integration-style smoke checks for MCP tool calls against running backend.
+1. Execute `P2-T7` and `P2-T8` from `docs/steps/phase-two-todo.md`.
+2. Add integration-style smoke checks for MCP tool calls against running backend.
+3. Expand docs with final CLI + MCP side-by-side usage examples.
 4. Keep implementation hackathon-scoped (no production hardening extras in this phase).

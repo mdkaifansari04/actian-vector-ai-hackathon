@@ -88,6 +88,12 @@ def build_parser() -> argparse.ArgumentParser:
     context_set_parser.add_argument("--instance-id", required=True)
     context_set_parser.add_argument("--namespace-id", required=True)
 
+    init_parser = subparsers.add_parser("init", help="Initialize active context for first-time usage")
+    init_parser.add_argument("--instance-id", default="")
+    init_parser.add_argument("--instance-name", default="DocuMind Instance")
+    init_parser.add_argument("--instance-description", default="Created by dcli init")
+    init_parser.add_argument("--namespace-id", default="company_docs")
+
     return parser
 
 
@@ -115,6 +121,70 @@ def _resolve_ingest_content(args: argparse.Namespace) -> tuple[str | None, dict[
 
 
 def execute_command(args: argparse.Namespace, service: DocuMindMCPService) -> dict[str, Any]:
+    if args.command == "init":
+        list_result = service.list_instances()
+        if list_result.get("status") != "success":
+            return list_result
+
+        instances = list_result.get("data", {}).get("instances", [])
+        selected_instance_id = args.instance_id.strip()
+        created_instance = False
+        selection_mode = ""
+
+        if selected_instance_id:
+            known_ids = {str(item.get("id", "")).strip() for item in instances if isinstance(item, dict)}
+            if selected_instance_id not in known_ids:
+                return _error_response(
+                    error="not_found",
+                    message=f"instance_id not found: {selected_instance_id}. Use `dcli instances` to list valid ids.",
+                )
+            selection_mode = "explicit"
+        else:
+            if instances:
+                selected_instance_id = str(instances[0].get("id", "")).strip()
+                selection_mode = "latest_existing"
+            else:
+                create_result = service.create_instance(
+                    name=args.instance_name,
+                    description=args.instance_description,
+                )
+                if create_result.get("status") != "success":
+                    return create_result
+                selected_instance_id = str(
+                    create_result.get("data", {}).get("instance", {}).get("id", "")
+                ).strip()
+                if not selected_instance_id:
+                    return _error_response(
+                        error="server_error",
+                        message="init failed: create_instance response missing instance id.",
+                    )
+                created_instance = True
+                selection_mode = "created_new"
+
+        set_result = service.set_active_context(
+            instance_id=selected_instance_id,
+            namespace_id=args.namespace_id,
+            context_id=args.context_id,
+        )
+        if set_result.get("status") != "success":
+            return set_result
+
+        data = dict(set_result.get("data", {}))
+        meta = dict(set_result.get("meta", {}))
+        data["created_instance"] = created_instance
+        data["selection_mode"] = selection_mode
+        data["available_instances"] = len(instances)
+        text = (
+            f"Initialized context '{args.context_id}' -> "
+            f"{selected_instance_id}/{args.namespace_id} ({selection_mode})."
+        )
+        return {
+            "status": "success",
+            "data": data,
+            "meta": meta,
+            "text": text,
+        }
+
     if args.command == "search-docs":
         return service.search_docs(
             query=args.query,

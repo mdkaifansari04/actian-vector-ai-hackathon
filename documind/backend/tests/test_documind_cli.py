@@ -19,6 +19,19 @@ class FakeService:
             "meta": {},
             "text": "ok",
         }
+        self.instances_response = {"status": "success", "data": {"instances": []}, "meta": {}, "text": "ok"}
+        self.create_instance_response = {
+            "status": "success",
+            "data": {"instance": {"id": "inst-new", "name": "New"}},
+            "meta": {},
+            "text": "ok",
+        }
+        self.set_context_response = {
+            "status": "success",
+            "data": {"context_id": "default", "instance_id": "inst-new", "namespace_id": "company_docs"},
+            "meta": {},
+            "text": "ok",
+        }
 
     def search_docs(self, **kwargs):
         self.calls.append(("search_docs", kwargs))
@@ -38,11 +51,11 @@ class FakeService:
 
     def list_instances(self, **kwargs):
         self.calls.append(("list_instances", kwargs))
-        return {"status": "success", "data": {"instances": []}, "meta": {}, "text": "ok"}
+        return self.instances_response
 
     def create_instance(self, **kwargs):
         self.calls.append(("create_instance", kwargs))
-        return {"status": "success", "data": {"instance": {"id": "inst-new"}}, "meta": {}, "text": "ok"}
+        return self.create_instance_response
 
     def list_namespaces(self, **kwargs):
         self.calls.append(("list_namespaces", kwargs))
@@ -59,12 +72,7 @@ class FakeService:
 
     def set_active_context(self, **kwargs):
         self.calls.append(("set_active_context", kwargs))
-        return {
-            "status": "success",
-            "data": {"context_id": kwargs.get("context_id", "default")},
-            "meta": {},
-            "text": "ok",
-        }
+        return self.set_context_response
 
 
 class DocuMindCLITests(unittest.TestCase):
@@ -240,6 +248,75 @@ class DocuMindCLITests(unittest.TestCase):
         self.assertEqual(name, "create_instance")
         self.assertEqual(payload["name"], "Hackathon A")
         self.assertEqual(payload["description"], "test")
+
+    def test_init_creates_instance_when_none_exist(self) -> None:
+        service = FakeService()
+        service.instances_response = {"status": "success", "data": {"instances": []}, "meta": {}, "text": "ok"}
+        service.create_instance_response = {
+            "status": "success",
+            "data": {"instance": {"id": "inst-created"}},
+            "meta": {},
+            "text": "ok",
+        }
+        service.set_context_response = {
+            "status": "success",
+            "data": {"context_id": "default", "instance_id": "inst-created", "namespace_id": "company_docs"},
+            "meta": {},
+            "text": "ok",
+        }
+        buffer = io.StringIO()
+        with redirect_stdout(buffer):
+            exit_code = run_cli(["init"], service=service)
+
+        self.assertEqual(exit_code, 0)
+        self.assertEqual([name for name, _ in service.calls], ["list_instances", "create_instance", "set_active_context"])
+        rendered = json.loads(buffer.getvalue())
+        self.assertEqual(rendered["status"], "success")
+        self.assertTrue(rendered["data"]["created_instance"])
+        self.assertEqual(rendered["data"]["selection_mode"], "created_new")
+
+    def test_init_uses_latest_instance_when_available(self) -> None:
+        service = FakeService()
+        service.instances_response = {
+            "status": "success",
+            "data": {"instances": [{"id": "inst-latest"}, {"id": "inst-older"}]},
+            "meta": {},
+            "text": "ok",
+        }
+        service.set_context_response = {
+            "status": "success",
+            "data": {"context_id": "default", "instance_id": "inst-latest", "namespace_id": "company_docs"},
+            "meta": {},
+            "text": "ok",
+        }
+        buffer = io.StringIO()
+        with redirect_stdout(buffer):
+            exit_code = run_cli(["init"], service=service)
+
+        self.assertEqual(exit_code, 0)
+        self.assertEqual([name for name, _ in service.calls], ["list_instances", "set_active_context"])
+        set_payload = service.calls[1][1]
+        self.assertEqual(set_payload["instance_id"], "inst-latest")
+        rendered = json.loads(buffer.getvalue())
+        self.assertEqual(rendered["data"]["selection_mode"], "latest_existing")
+
+    def test_init_with_invalid_instance_id_fails(self) -> None:
+        service = FakeService()
+        service.instances_response = {
+            "status": "success",
+            "data": {"instances": [{"id": "inst-1"}]},
+            "meta": {},
+            "text": "ok",
+        }
+        buffer = io.StringIO()
+        with redirect_stdout(buffer):
+            exit_code = run_cli(["init", "--instance-id", "bad-id"], service=service)
+
+        self.assertEqual(exit_code, 1)
+        self.assertEqual([name for name, _ in service.calls], ["list_instances"])
+        rendered = json.loads(buffer.getvalue())
+        self.assertEqual(rendered["status"], "error")
+        self.assertEqual(rendered["meta"]["error"], "not_found")
 
 
 if __name__ == "__main__":

@@ -1,34 +1,26 @@
-<script lang="ts">
-	import { taskStats, tasks } from '$lib/stores/tasks';
-</script>
-
 <section class="panel">
 	<h2>Analytics</h2>
-	<p class="muted">This route reads a <code>derived</code> store computed from the shared task store.</p>
+	<p class="muted">
+		Todo analytics have been removed along with the shared task store. This page is now a static
+		reference panel.
+	</p>
 
 	<div class="stats-grid">
 		<article>
-			<h3>Total tasks</h3>
-			<p>{$taskStats.total}</p>
+			<h3>Shared Stores</h3>
+			<p>0</p>
 		</article>
 		<article>
-			<h3>Open tasks</h3>
-			<p>{$taskStats.open}</p>
+			<h3>Todo Actions</h3>
+			<p>Removed</p>
 		</article>
 		<article>
-			<h3>Completed</h3>
-			<p>{$taskStats.completed}</p>
+			<h3>Cross-Route Mutations</h3>
+			<p>None</p>
 		</article>
 		<article>
-			<h3>Completion</h3>
-			<p>{$taskStats.completionRate}%</p>
+			<h3>Current Mode</h3>
+			<p>Static UI</p>
 		</article>
-	</div>
-
-	<div class="action-row">
-		<span class="muted">Actions apply globally because the writable store is shared across routes.</span>
-		<button type="button" onclick={() => tasks.clearCompleted()} disabled={$taskStats.completed === 0}>
-			Clear completed
-		</button>
 	</div>
 </section>

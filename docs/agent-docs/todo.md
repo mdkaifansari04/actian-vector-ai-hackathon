@@ -2,8 +2,8 @@
 
 Purpose: This is the operational reference file that must be updated after every implementation iteration so future work always has context.
 
-Last Updated: 2026-04-15
-Current Focus: Phase 2 execution (hackathon mode) using instance-scoped MCP + CLI contract.
+Last Updated: 2026-04-16
+Current Focus: Phase 3 frontend kickoff planning after Phase 2 completion.
 
 ---
 
@@ -134,17 +134,17 @@ Use this checklist at the end of every coding cycle.
 - [x] Update Postman collection with advanced requests
 - [x] Update docs (`documind/backend/README.md`, `documind/backend/IMPLEMENTATION_TEST_GUIDE.md`)
 
-### Phase 2: Agent Integration (IN PROGRESS)
+### Phase 2: Agent Integration (COMPLETE)
 
-- [ ] Execute Phase 2 checklist in `docs/steps/phase-two-todo.md`
-- [ ] MCP tool surface complete:
+- [x] Execute Phase 2 checklist in `docs/steps/phase-two-todo.md`
+- [x] MCP tool surface complete:
   - `search_docs`
   - `ask_docs`
   - `ingest_text`
   - `list_knowledge_bases`
-- [ ] CLI command surface complete for same 4 operations
-- [ ] Stable JSON response envelope + error mapping applied to all tools
-- [ ] Hackathon verification gate passed and tracker moved to COMPLETE
+- [x] CLI command surface complete for same 4 operations
+- [x] Stable JSON response envelope + error mapping applied to all tools
+- [x] Hackathon verification gate passed and tracker moved to COMPLETE
 
 ### Phase 3: Frontend (DEFERRED)
 
@@ -504,8 +504,23 @@ These are non-blocking but high-value improvements for reliability and observabi
   - `docs/steps/phase-two-testing-runbook.md` now includes first-time context setup and MCP context-switch prompts
   - `docs/steps/phase-two-todo.md` now marks `P2-T7` and `P2-T8` complete
 
+### Iteration 12 — Phase 2 Closeout + Guardrails Hardening (2026-04-16)
+
+- Added MCP guardrails to reduce context drift/hallucination in agent sessions:
+  - `create_instance` now requires explicit confirmation (`confirm_create=true`)
+  - `set_active_context` now blocks unknown namespaces by default unless explicitly overridden
+- Added guardrail unit coverage:
+  - `tests/test_mcp_server_guards.py`
+- Strengthened universal DCLI skill behavior:
+  - strict no-silent-fallback-to-MCP rule on DCLI errors
+  - explicit DCLI-only context repair sequence
+  - project-scoped context-id guidance and UX rules for instance/namespace selection
+- Updated integration docs with top-session prompt template for Codex.
+- Verified relevant Phase 2 test suites pass (CLI + MCP + guard tests).
+- Marked `docs/steps/phase-two-todo.md` completion gate as complete.
+
 ### Next Planned Iteration
 
-1. Execute `P2-GATE` verification from `docs/steps/phase-two-todo.md`.
-2. Run one live Codex MCP smoke session with context-set -> search/ask -> context switch flow.
-3. Capture user feedback from runbook template and close Phase 2 tracker.
+1. Start Phase 3 frontend kickoff (UI scope + baseline architecture).
+2. Define frontend-first acceptance checklist (chat flow, context visibility, ingestion UX).
+3. Create Phase 3 TODO and implementation slices with test/verification plan.

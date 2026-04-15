@@ -1,0 +1,1422 @@
+{
+  "info": {
+    "_postman_id": "7be750da-9597-4913-afb6-fb60898d0496",
+    "name": "DocuMind Backend v1",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "23890951",
+    "_collection_link": "https://go.postman.co/collection/23890951-7be750da-9597-4913-afb6-fb60898d0496?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Phase 1 Flow",
+      "item": [
+        {
+          "name": "health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/health",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "health"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "health",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/health",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "health"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "date",
+                  "value": "Wed, 15 Apr 2026 09:45:48 GMT"
+                },
+                {
+                  "key": "server",
+                  "value": "uvicorn"
+                },
+                {
+                  "key": "content-length",
+                  "value": "106"
+                },
+                {
+                  "key": "content-type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"status\": \"ok\",\n    \"vectordb\": {\n        \"title\": \"Actian VectorAI DB\",\n        \"version\": \"Actian VectorAI DB 1.0.0 / VDE 1.0.0\"\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "create-instance",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const body = pm.response.json();",
+                  "  if (body.id) pm.collectionVariables.set('instance_id', body.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Acme Corp\",\n  \"description\": \"Manual QA instance\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/instances",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "instances"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "create-instance",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Kaif local\",\n  \"description\": \"some quetsions for exams\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/instances",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "instances"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "date",
+                  "value": "Wed, 15 Apr 2026 09:45:56 GMT"
+                },
+                {
+                  "key": "server",
+                  "value": "uvicorn"
+                },
+                {
+                  "key": "content-length",
+                  "value": "190"
+                },
+                {
+                  "key": "content-type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"id\": \"cb6fcfe4-1ea7-4c19-922c-35598ac76017\",\n    \"name\": \"Kaif local\",\n    \"description\": \"some quetsions for exams\",\n    \"created_at\": \"2026-04-15T09:45:56.687274\",\n    \"updated_at\": \"2026-04-15T09:45:56.687274\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "create-knowledge-base",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const body = pm.response.json();",
+                  "  if (body.id) pm.collectionVariables.set('kb_id', body.id);",
+                  "}"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"instance_id\": \"50d832d6-2a01-45ce-9947-bbad59a3fe93\",\n\n  \"namespace_id\": \"semester 1\" , \"name\": \"Engineering Docs\",\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/knowledge-bases",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "knowledge-bases"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "create-knowledge-base",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"instance_id\": \"50d832d6-2a01-45ce-9947-bbad59a3fe93\",\n  \"name\": \"Engineering Docs\",\n  \"namespace_id\": \"semester 1\",\n  \"embedding_model\": \"minilm\",\n  \"distance_metric\": \"cosine\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/knowledge-bases",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "knowledge-bases"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "date",
+                  "value": "Wed, 15 Apr 2026 09:46:06 GMT"
+                },
+                {
+                  "key": "server",
+                  "value": "uvicorn"
+                },
+                {
+                  "key": "content-length",
+                  "value": "436"
+                },
+                {
+                  "key": "content-type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"id\": \"a462f351-ff40-47c9-9033-d998f98030a3\",\n    \"instance_id\": \"50d832d6-2a01-45ce-9947-bbad59a3fe93\",\n    \"name\": \"Engineering Docs\",\n    \"namespace_id\": \"semester 1\",\n    \"collection_name\": \"kb_50d832d6_a462f351\",\n    \"embedding_model\": \"minilm\",\n    \"embedding_dim\": 384,\n    \"distance_metric\": \"cosine\",\n    \"status\": \"active\",\n    \"created_at\": \"2026-04-15T09:46:06.574883\",\n    \"updated_at\": \"2026-04-15T09:46:06.574883\",\n    \"embedding_profile\": \"general_text_search\",\n    \"llm_profile\": \"balanced\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "ingest-resource-json-instance-scope",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const body = pm.response.json();",
+                  "  if (body.kb_id) pm.collectionVariables.set('kb_id', body.kb_id);",
+                  "  if (body.resource_id) pm.collectionVariables.set('resource_id', body.resource_id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"instance_id\": \"{{instance_id}}\",\n  \"namespace_id\": \"{{namespace_id}}\",\n  \"source_type\": \"text\",\n  \"content\": \"Payments deploy flow: push main, CI builds image, release to prod.\",\n  \"source_ref\": \"deploy-notes.txt\",\n  \"user_id\": \"user_123\",\n  \"session_id\": \"sess_001\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/resources",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "resources"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "ingest-resource-json-instance-scope",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"instance_id\": \"50d832d6-2a01-45ce-9947-bbad59a3fe93\",\n    \"namespace_id\": \"semester 1\",\n    \"source_type\": \"text\",\n    \"content\": \"I have subjects like computer neworks, emebeded systesm, computer graphics and compiler design and more. I also have assignments and projects to work on. I need help with understanding the concepts and completing the tasks.\",\n    \"source_ref\": \"deploy-notes.txt\",\n    \"user_id\": \"user_123\",\n    \"session_id\": \"sess_001\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/resources",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "resources"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "date",
+                  "value": "Wed, 15 Apr 2026 09:40:52 GMT"
+                },
+                {
+                  "key": "server",
+                  "value": "uvicorn"
+                },
+                {
+                  "key": "content-length",
+                  "value": "139"
+                },
+                {
+                  "key": "content-type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"status\": \"success\",\n    \"kb_id\": \"7fa0e32c-bd4f-42fc-9760-40aad3b9958f\",\n    \"resource_id\": \"d76d1bca-3bb1-4ba3-ad3f-da0a60e7e1d0\",\n    \"chunks_indexed\": 1\n}"
+            }
+          ]
+        },
+        {
+          "name": "ingest-resource-json-kb-scope-legacy",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"kb_id\": \"{{kb_id}}\",\n  \"source_type\": \"markdown\",\n  \"content\": \"# Deploy Notes\\n1. Merge to main\\n2. Wait for CI\\n3. Release\",\n  \"source_ref\": \"deploy-notes.md\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/resources",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "resources"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "ingest-resource-json-kb-scope-legacy",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"kb_id\": \"{{kb_id}}\",\n  \"source_type\": \"markdown\",\n  \"content\": \"# Deploy Notes\\n1. Merge to main\\n2. Wait for CI\\n3. Release\",\n  \"source_ref\": \"deploy-notes.md\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/resources",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "resources"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "date",
+                  "value": "Wed, 15 Apr 2026 09:46:20 GMT"
+                },
+                {
+                  "key": "server",
+                  "value": "uvicorn"
+                },
+                {
+                  "key": "content-length",
+                  "value": "139"
+                },
+                {
+                  "key": "content-type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"status\": \"success\",\n    \"kb_id\": \"a462f351-ff40-47c9-9033-d998f98030a3\",\n    \"resource_id\": \"b5907040-24de-44e8-8ec9-5bdc3c5af91b\",\n    \"chunks_indexed\": 1\n}"
+            }
+          ]
+        },
+        {
+          "name": "ingest-resource-formdata-file",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "instance_id",
+                  "value": "{{instance_id}}",
+                  "type": "text"
+                },
+                {
+                  "key": "namespace_id",
+                  "value": "{{namespace_id}}",
+                  "type": "text"
+                },
+                {
+                  "key": "source_type",
+                  "value": "markdown",
+                  "type": "text"
+                },
+                {
+                  "key": "source_ref",
+                  "value": "notes.md",
+                  "type": "text"
+                },
+                {
+                  "key": "file",
+                  "type": "file",
+                  "value": ""
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/resources",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "resources"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "ingest-resource-formdata-file",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "instance_id",
+                      "value": "{{instance_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "namespace_id",
+                      "value": "{{namespace_id}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "source_type",
+                      "value": "markdown",
+                      "type": "text"
+                    },
+                    {
+                      "key": "source_ref",
+                      "value": "notes.md",
+                      "type": "text"
+                    },
+                    {
+                      "key": "file",
+                      "type": "file",
+                      "src": [
+                        "",
+                        "/Users/mdkaifansari04/college/6th semester/embeded system/3.pdf"
+                      ]
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/resources",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "resources"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "date",
+                  "value": "Wed, 15 Apr 2026 09:46:47 GMT"
+                },
+                {
+                  "key": "server",
+                  "value": "uvicorn"
+                },
+                {
+                  "key": "content-length",
+                  "value": "141"
+                },
+                {
+                  "key": "content-type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"status\": \"success\",\n    \"kb_id\": \"a1fd1213-e7c2-4ba6-a0a3-16263184f69e\",\n    \"resource_id\": \"08ba4dfc-d5e9-4c30-aea3-aca15c659c4e\",\n    \"chunks_indexed\": 200\n}"
+            }
+          ]
+        },
+        {
+          "name": "list-resources-instance-scope",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/resources?instance_id={{instance_id}}&namespace_id={{namespace_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "resources"
+              ],
+              "query": [
+                {
+                  "key": "instance_id",
+                  "value": "{{instance_id}}"
+                },
+                {
+                  "key": "namespace_id",
+                  "value": "{{namespace_id}}"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "list-resources-instance-scope",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/resources?instance_id={{instance_id}}&namespace_id={{namespace_id}}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "resources"
+                  ],
+                  "query": [
+                    {
+                      "key": "instance_id",
+                      "value": "{{instance_id}}"
+                    },
+                    {
+                      "key": "namespace_id",
+                      "value": "{{namespace_id}}"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "date",
+                  "value": "Wed, 15 Apr 2026 09:42:06 GMT"
+                },
+                {
+                  "key": "server",
+                  "value": "uvicorn"
+                },
+                {
+                  "key": "content-length",
+                  "value": "555"
+                },
+                {
+                  "key": "content-type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "[\n    {\n        \"id\": \"d76d1bca-3bb1-4ba3-ad3f-da0a60e7e1d0\",\n        \"knowledge_base_id\": \"7fa0e32c-bd4f-42fc-9760-40aad3b9958f\",\n        \"source_type\": \"text\",\n        \"source_ref\": \"deploy-notes.txt\",\n        \"chunks_indexed\": 1,\n        \"status\": \"done\",\n        \"created_at\": \"2026-04-15T09:40:53.034182\",\n        \"updated_at\": \"2026-04-15T09:40:53.452471\"\n    },\n    {\n        \"id\": \"67ce2434-69da-46a4-8e3b-c3cbd9c43182\",\n        \"knowledge_base_id\": \"7fa0e32c-bd4f-42fc-9760-40aad3b9958f\",\n        \"source_type\": \"text\",\n        \"source_ref\": \"deploy-notes.txt\",\n        \"chunks_indexed\": 1,\n        \"status\": \"done\",\n        \"created_at\": \"2026-04-15T09:39:37.355992\",\n        \"updated_at\": \"2026-04-15T09:39:45.920202\"\n    }\n]"
+            }
+          ]
+        },
+        {
+          "name": "list-resources-kb-scope-legacy",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/resources?kb_id={{kb_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "resources"
+              ],
+              "query": [
+                {
+                  "key": "kb_id",
+                  "value": "{{kb_id}}"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "list-resources-kb-scope-legacy",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/resources?kb_id={{kb_id}}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "resources"
+                  ],
+                  "query": [
+                    {
+                      "key": "kb_id",
+                      "value": "{{kb_id}}"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "date",
+                  "value": "Wed, 15 Apr 2026 09:44:00 GMT"
+                },
+                {
+                  "key": "server",
+                  "value": "uvicorn"
+                },
+                {
+                  "key": "content-length",
+                  "value": "555"
+                },
+                {
+                  "key": "content-type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "[\n    {\n        \"id\": \"d76d1bca-3bb1-4ba3-ad3f-da0a60e7e1d0\",\n        \"knowledge_base_id\": \"7fa0e32c-bd4f-42fc-9760-40aad3b9958f\",\n        \"source_type\": \"text\",\n        \"source_ref\": \"deploy-notes.txt\",\n        \"chunks_indexed\": 1,\n        \"status\": \"done\",\n        \"created_at\": \"2026-04-15T09:40:53.034182\",\n        \"updated_at\": \"2026-04-15T09:40:53.452471\"\n    },\n    {\n        \"id\": \"67ce2434-69da-46a4-8e3b-c3cbd9c43182\",\n        \"knowledge_base_id\": \"7fa0e32c-bd4f-42fc-9760-40aad3b9958f\",\n        \"source_type\": \"text\",\n        \"source_ref\": \"deploy-notes.txt\",\n        \"chunks_indexed\": 1,\n        \"status\": \"done\",\n        \"created_at\": \"2026-04-15T09:39:37.355992\",\n        \"updated_at\": \"2026-04-15T09:39:45.920202\"\n    }\n]"
+            }
+          ]
+        },
+        {
+          "name": "search-instance-scope",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"instance_id\": \"{{instance_id}}\",\n  \"namespace_id\": \"{{namespace_id}}\",\n  \"query\": \"how do we deploy payments service\",\n  \"top_k\": 3\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/search/instance",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "search",
+                "instance"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "search-instance-scope",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"instance_id\": \"{{instance_id}}\",\n  \"namespace_id\": \"{{namespace_id}}\",\n  \"query\": \"how do we deploy payments service\",\n  \"top_k\": 3\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/search/instance",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "search",
+                    "instance"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "date",
+                  "value": "Wed, 15 Apr 2026 09:44:12 GMT"
+                },
+                {
+                  "key": "server",
+                  "value": "uvicorn"
+                },
+                {
+                  "key": "content-length",
+                  "value": "816"
+                },
+                {
+                  "key": "content-type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"kb_id\": \"7fa0e32c-bd4f-42fc-9760-40aad3b9958f\",\n    \"instance_id\": \"50d832d6-2a01-45ce-9947-bbad59a3fe93\",\n    \"namespace_id\": \"semester 1\",\n    \"results\": [\n        {\n            \"id\": 499165351754857458,\n            \"text\": \"Payments deploy flow: push main, CI builds image, release to prod.\",\n            \"score\": 0.6274244785308838,\n            \"source_ref\": \"deploy-notes.txt\",\n            \"chunk_index\": 0,\n            \"resource_id\": \"67ce2434-69da-46a4-8e3b-c3cbd9c43182\",\n            \"namespace_id\": \"semester 1\"\n        },\n        {\n            \"id\": 415323607895132984,\n            \"text\": \"I have subjects like computer neworks, emebeded systesm, computer graphics and compiler design and more. I also have assignments and projects to work on. I need help with understanding the concepts and completing the tasks.\",\n            \"score\": -0.01970820315182209,\n            \"source_ref\": \"deploy-notes.txt\",\n            \"chunk_index\": 0,\n            \"resource_id\": \"d76d1bca-3bb1-4ba3-ad3f-da0a60e7e1d0\",\n            \"namespace_id\": \"semester 1\"\n        }\n    ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "query-instance-scope",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"instance_id\": \"{{instance_id}}\",\n  \"namespace_id\": \"{{namespace_id}}\",\n  \"question\": \"How do we deploy the payments service?\",\n  \"top_k\": 3\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/query/instance",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "query",
+                "instance"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "query-instance-scope",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"instance_id\": \"{{instance_id}}\",\n  \"namespace_id\": \"{{namespace_id}}\",\n  \"question\": \"How many subjects do we have?\",\n  \"top_k\": 3\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/query/instance",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "query",
+                    "instance"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "date",
+                  "value": "Wed, 15 Apr 2026 09:45:15 GMT"
+                },
+                {
+                  "key": "server",
+                  "value": "uvicorn"
+                },
+                {
+                  "key": "content-length",
+                  "value": "1000"
+                },
+                {
+                  "key": "content-type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"kb_id\": \"7fa0e32c-bd4f-42fc-9760-40aad3b9958f\",\n    \"instance_id\": \"50d832d6-2a01-45ce-9947-bbad59a3fe93\",\n    \"namespace_id\": \"semester 1\",\n    \"answer\": \"You have subjects like computer networks, embedded systems, computer graphics, and compiler design, which totals four subjects.\",\n    \"sources\": [\n        {\n            \"id\": 415323607895132984,\n            \"text\": \"I have subjects like computer neworks, emebeded systesm, computer graphics and compiler design and more. I also have assignments and projects to work on. I need help with understanding the concepts and completing the tasks.\",\n            \"score\": 0.3497893214225769,\n            \"source_ref\": \"deploy-notes.txt\",\n            \"chunk_index\": 0,\n            \"resource_id\": \"d76d1bca-3bb1-4ba3-ad3f-da0a60e7e1d0\",\n            \"namespace_id\": \"semester 1\"\n        },\n        {\n            \"id\": 499165351754857458,\n            \"text\": \"Payments deploy flow: push main, CI builds image, release to prod.\",\n            \"score\": -0.052564043551683426,\n            \"source_ref\": \"deploy-notes.txt\",\n            \"chunk_index\": 0,\n            \"resource_id\": \"67ce2434-69da-46a4-8e3b-c3cbd9c43182\",\n            \"namespace_id\": \"semester 1\"\n        }\n    ],\n    \"response_ms\": 1205,\n    \"llm_profile\": \"balanced\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "search-advanced-instance-scope",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"instance_id\": \"{{instance_id}}\",\n  \"namespace_id\": \"{{namespace_id}}\",\n  \"query\": \"deployment notes for user_123\",\n  \"mode\": \"hybrid\",\n  \"hybrid\": {\n    \"method\": \"rrf\",\n    \"dense_weight\": 0.7,\n    \"keyword_weight\": 0.3\n  },\n  \"filters\": {\n    \"must\": [\n      {\"field\": \"source_type\", \"op\": \"any_of\", \"value\": [\"text\", \"markdown\"]},\n      {\"field\": \"user_id\", \"op\": \"eq\", \"value\": \"user_123\"}\n    ]\n  },\n  \"top_k\": 5\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/search/advanced",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "search",
+                "advanced"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "search-advanced-instance-scope",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"instance_id\": \"{{instance_id}}\",\n  \"namespace_id\": \"{{namespace_id}}\",\n  \"query\": \"deployment notes for user_123\",\n  \"mode\": \"hybrid\",\n  \"hybrid\": {\n    \"method\": \"rrf\",\n    \"dense_weight\": 0.7,\n    \"keyword_weight\": 0.3\n  },\n  \"filters\": {\n    \"must\": [\n      {\"field\": \"source_type\", \"op\": \"any_of\", \"value\": [\"text\", \"markdown\"]},\n      {\"field\": \"user_id\", \"op\": \"eq\", \"value\": \"user_123\"}\n    ]\n  },\n  \"top_k\": 5\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/search/advanced",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "search",
+                    "advanced"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "date",
+                  "value": "Wed, 15 Apr 2026 09:45:39 GMT"
+                },
+                {
+                  "key": "server",
+                  "value": "uvicorn"
+                },
+                {
+                  "key": "content-length",
+                  "value": "785"
+                },
+                {
+                  "key": "content-type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"instance_id\": \"50d832d6-2a01-45ce-9947-bbad59a3fe93\",\n    \"namespace_id\": \"semester 1\",\n    \"mode\": \"hybrid\",\n    \"results\": [\n        {\n            \"id\": 499165351754857458,\n            \"text\": \"Payments deploy flow: push main, CI builds image, release to prod.\",\n            \"score\": 0.3272344172000885,\n            \"source_ref\": \"deploy-notes.txt\",\n            \"chunk_index\": 0,\n            \"resource_id\": \"67ce2434-69da-46a4-8e3b-c3cbd9c43182\",\n            \"namespace_id\": \"semester 1\"\n        },\n        {\n            \"id\": 415323607895132984,\n            \"text\": \"I have subjects like computer neworks, emebeded systesm, computer graphics and compiler design and more. I also have assignments and projects to work on. I need help with understanding the concepts and completing the tasks.\",\n            \"score\": 0.022597961127758026,\n            \"source_ref\": \"deploy-notes.txt\",\n            \"chunk_index\": 0,\n            \"resource_id\": \"d76d1bca-3bb1-4ba3-ad3f-da0a60e7e1d0\",\n            \"namespace_id\": \"semester 1\"\n        }\n    ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "query-advanced-instance-scope",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"instance_id\": \"{{instance_id}}\",\n  \"namespace_id\": \"{{namespace_id}}\",\n  \"question\": \"Summarize deployment constraints from docs.\",\n  \"mode\": \"hybrid\",\n  \"hybrid\": {\n    \"method\": \"rrf\",\n    \"dense_weight\": 0.7,\n    \"keyword_weight\": 0.3\n  },\n  \"filters\": {\n    \"must\": [\n      {\"field\": \"source_type\", \"op\": \"any_of\", \"value\": [\"text\", \"markdown\"]}\n    ]\n  },\n  \"top_k\": 5\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/query/advanced",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "query",
+                "advanced"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "query-advanced-instance-scope",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"instance_id\": \"{{instance_id}}\",\n  \"namespace_id\": \"{{namespace_id}}\",\n  \"question\": \"How many subjects we have ?\",\n  \"mode\": \"hybrid\",\n  \"hybrid\": {\n    \"method\": \"rrf\",\n    \"dense_weight\": 0.7,\n    \"keyword_weight\": 0.3\n  },\n  \"filters\": {\n    \"must\": [\n      {\"field\": \"source_type\", \"op\": \"any_of\", \"value\": [\"text\", \"markdown\"]}\n    ]\n  },\n  \"top_k\": 5\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/query/advanced",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "query",
+                    "advanced"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "date",
+                  "value": "Wed, 15 Apr 2026 09:49:04 GMT"
+                },
+                {
+                  "key": "server",
+                  "value": "uvicorn"
+                },
+                {
+                  "key": "content-length",
+                  "value": "8222"
+                },
+                {
+                  "key": "content-type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"instance_id\": \"cb6fcfe4-1ea7-4c19-922c-35598ac76017\",\n    \"namespace_id\": \"semester 1\",\n    \"mode\": \"hybrid\",\n    \"answer\": \"I don't know.\",\n    \"sources\": [\n        {\n            \"id\": 889205048647215607,\n            \"text\": \"771 0 R 774 0 R 775 0 R 776 0 R 1038 0 R 780 0 R 781 0 R 782 0 R 1039 0 R 790 0 R 809 0 R 791 0 R 792 0 R 793 0 R 794 0 R 795 0 R 796 0 R 797 0 R 1040 0 R 810 0 R 832 0 R 811 0 R 833 0 R 812 0 R 813 0 R 814 0 R 815 0 R 816 0 R 1041 0 R 820 0 R 821 0 R 822 0 R 823 0 R 824 0 R 834 0 R 825 0 R 826 0 R 827 0 R 828 0 R 835 0 R 829 0 R 830 0 R 831 0 R 836 0 R 1042 0 R 838 0 R 839 0 R 840 0 R 1043 0 R 846 0 R 847 0 R 848 0 R 849 0 R 850 0 R 851 0 R 852 0 R 853 0 R 854 0 R 855 0 R 856 0 R 857 0 R 863 0 R 858 0 R 859 0 R 860 0 R 861 0 R 864 0 R 862 0 R 865 0 R 866 0 R 867 0 R 868 0 R 869 0 R 1044 0 R 878 0 R 879 0 R 896 0 R 880 0 R 881 0 R 882 0 R 883 0 R 897 0 R 884 0 R 885 0 R 886 0 R 887 0 R 888 0 R 1045 0 R 898 0 R 899 0 R 900 0 R 901 0 R 1046 0 R 908 0 R 909 0 R 917 0 R 918 0 R 910 0 R 911 0 R 912 0 R 1047 0 R 916 0 R 919 0 R 937 0 R 920 0 R 921 0 R 922 0 R 923 0 R 924 0 R 925 0 R 926 0 R 1048 0 R 931 0 R 938 0 R 932 0 R 933 0 R 934 0 R 935 0 R 936 0 R 939 0 R 940 0 R 941 0 R 942 0 R 943 0 R 944 0 R 945 0 R 946 0 R 1049 0 R 949 0 R] >> endobj 40 0 obj << /Type /Font /Subtype /TrueType /Name /F1 /BaseFont /TimesNewRomanPS-BoldMT /Encoding /WinAnsiEncoding /FontDescriptor 1050 0 R /FirstChar 32 /LastChar 122 /Widths [250 0 0 0 0 0 833 0 333 333 0 0 250 333 250 278 500 500 500 500 500 500 500 500 500 500 333 0 0 0 0 0 0 722 667 722 722 667 611 778 778 389 0 778 667 944 722 778 611 0 722 556 667 722 722 1000 0 722 0 0 0 0 0 0 0 500 556 444 556 444 333 500 556 278 0 556 278 833 556 500 556 556 444 389 333 556 500 722 500 500 444] >> endobj 41 0 obj << /Type /Font /Subtype\",\n            \"score\": 0.16020171344280243,\n            \"source_ref\": \"notes.md\",\n            \"chunk_index\": 14,\n            \"resource_id\": \"08ba4dfc-d5e9-4c30-aea3-aca15c659c4e\",\n            \"namespace_id\": \"semester 1\"\n        },\n        {\n            \"id\": 576082396927433019,\n            \"text\": \"298 0 R 299 0 R 300 0 R 301 0 R 302 0 R 977 0 R 304 0 R 978 0 R 306 0 R 979 0 R 308 0 R 980 0 R 310 0 R 311 0 R 342 0 R 312 0 R 313 0 R 981 0 R 331 0 R 332 0 R 333 0 R 982 0 R 340 0 R 341 0 R 343 0 R 370 0 R 344 0 R 345 0 R 346 0 R 347 0 R 348 0 R 349 0 R 983 0 R 984 0 R 352 0 R 353 0 R 354 0 R 985 0 R 986 0 R 357 0 R 358 0 R 359 0 R 360 0 R 361 0 R 362 0 R 363 0 R 364 0 R 365 0 R 366 0 R 367 0 R 987 0 R 369 0 R 379 0 R 395 0 R 988 0 R 382 0 R 396 0 R 383 0 R 989 0 R 387 0 R 388 0 R 389 0 R 390 0 R 990 0 R 397 0 R 425 0 R 398 0 R 399 0 R 991 0 R 401 0 R 992 0 R 403 0 R 993 0 R 405 0 R 994 0 R 407 0 R 408 0 R 409 0 R 995 0 R 411 0 R 996 0 R 413 0 R 997 0 R 415 0 R 998 0 R 417 0 R 999 0 R 419 0 R 420 0 R 421 0 R 422 0 R 423 0 R 424 0 R 426 0 R 427 0 R 1000 0 R 431 0 R 1001 0 R 433 0 R 446 0 R 434 0 R 435 0 R 436 0 R 437 0 R 438 0 R 439 0 R 440 0 R 1002 0 R 442 0 R 1003 0 R 445 0 R 447 0 R 467 0 R 1004 0 R 449 0 R 1005 0 R 451 0 R 1006 0 R 453 0 R 1007 0 R 455 0 R 1008 0 R 457 0 R 1009 0 R 459 0 R 1010 0 R 461 0 R 462 0 R 463 0 R 464 0 R 1011 0 R 1012 0 R 469 0 R 480 0 R 470 0 R 471 0 R 472 0 R 473 0 R 474 0 R 475 0 R 476 0 R 477 0 R 1013 0 R 1014 0 R 486 0 R 487 0 R 488 0 R 489 0 R 1015 0 R 493 0 R 506 0 R 494 0 R 495 0 R 496 0 R 497 0 R 1016 0 R 501 0 R 507 0 R 502 0 R 503 0 R 504 0 R 505 0 R 508 0 R 509 0 R 510 0 R 511 0 R 512 0 R 513 0 R 1017 0 R 528 0 R 1018 0\",\n            \"score\": 0.15716096758842468,\n            \"source_ref\": \"notes.md\",\n            \"chunk_index\": 12,\n            \"resource_id\": \"08ba4dfc-d5e9-4c30-aea3-aca15c659c4e\",\n            \"namespace_id\": \"semester 1\"\n        },\n        {\n            \"id\": 107707945884366167,\n            \"text\": \"0 R 747 0 R] 20 [748 0 R 749 0 R 750 0 R 751 0 R 752 0 R 753 0 R 754 0 R 755 0 R 756 0 R 757 0 R 758 0 R 759 0 R 760 0 R 761 0 R 762 0 R 763 0 R 764 0 R 765 0 R 766 0 R 767 0 R 768 0 R 769 0 R 770 0 R 771 0 R 772 0 R 773 0 R] 21 [774 0 R 775 0 R 776 0 R 777 0 R 778 0 R 779 0 R 780 0 R 781 0 R 782 0 R 783 0 R 784 0 R 785 0 R 786 0 R 787 0 R 788 0 R 789 0 R 790 0 R 791 0 R 792 0 R 793 0 R 794 0 R 795 0 R 796 0 R 797 0 R 798 0 R 799 0 R 800 0 R 801 0 R 802 0 R 803 0 R 804 0 R 805 0 R 806 0 R 807 0 R 808 0 R 809 0 R] 22 [810 0 R 811 0 R 812 0 R 813 0 R 814 0 R 815 0 R 816 0 R 817 0 R 818 0 R 819 0 R 820 0 R 821 0 R 822 0 R 823 0 R 824 0 R 825 0 R 826 0 R 827 0 R 828 0 R 829 0 R 830 0 R 831 0 R 832 0 R 833 0 R 834 0 R 835 0 R] 23 [836 0 R 837 0 R 838 0 R 839 0 R 840 0 R 841 0 R 842 0 R 843 0 R 844 0 R 845 0 R 846 0 R 847 0 R 848 0 R 849 0 R 850 0 R 851 0 R 852 0 R 853 0 R 854 0 R 855 0 R 856 0 R 857 0 R 858 0 R 859 0 R 860 0 R 861 0 R 862 0 R 863 0 R 864 0 R] 24 [865 0 R 866 0 R 867 0 R 868 0 R 869 0 R 870 0 R 871 0 R 872 0 R 873 0 R 874 0 R 875 0 R 876 0 R 877 0 R 878 0 R 879 0 R 880 0 R 881 0 R 882 0 R 883 0 R 884 0 R 885 0 R 886 0 R 887 0 R 888 0 R 889 0 R 890 0 R 891 0 R 892 0 R 893 0 R 894 0 R 895 0 R 896 0 R 897 0 R] 25 [898 0 R 899 0 R 900 0 R 901 0 R 902 0 R 903 0 R 904 0 R 905 0 R 906 0 R 907 0 R 908 0 R 909 0 R 910 0 R 911 0 R 912 0 R 913 0 R 914 0 R\",\n            \"score\": 0.1507241129875183,\n            \"source_ref\": \"notes.md\",\n            \"chunk_index\": 10,\n            \"resource_id\": \"08ba4dfc-d5e9-4c30-aea3-aca15c659c4e\",\n            \"namespace_id\": \"semester 1\"\n        },\n        {\n            \"id\": 517671947401522851,\n            \"text\": \"497 0 R 1016 0 R 501 0 R 507 0 R 502 0 R 503 0 R 504 0 R 505 0 R 508 0 R 509 0 R 510 0 R 511 0 R 512 0 R 513 0 R 1017 0 R 528 0 R 1018 0 R 531 0 R 532 0 R 1019 0 R 541 0 R 542 0 R 1020 0 R 549 0 R 550 0 R 1021 0 R 1022 0 R 557 0 R 558 0 R 559 0 R 1023 0 R 568 0 R 569 0 R 1024 0 R 576 0 R 577 0 R 578 0 R 579 0 R 580 0 R 581 0 R 1025 0 R 584 0 R 1026 0 R 586 0 R 594 0 R 587 0 R 588 0 R 589 0 R 590 0 R 1027 0 R 1028 0 R 598 0 R 599 0 R 600 0 R 601 0 R 613 0 R 602 0 R 603 0 R 614 0 R 604 0 R 605 0 R 606 0 R 607 0 R 608 0 R 1029 0 R 612 0 R 615 0 R 616 0 R 617 0 R 618 0 R 619 0 R 620 0 R 621 0 R 1030 0 R 647 0 R 648 0 R 649 0 R 652 0 R 655 0 R 658 0 R 1031 0 R 672 0 R 673 0 R 674 0 R 675 0 R 676 0 R 1032 0 R 678 0 R 1033 0 R 681 0 R 1034 0 R 691 0 R 1035 0 R 701 0 R 1036 0 R 710 0 R 711 0 R 712 0 R 713 0 R 714 0 R 715 0 R 716 0 R 717 0 R 718 0 R 719 0 R 1037 0 R 725 0 R 726 0 R 727 0 R 728 0 R 729 0 R 730 0 R 747 0 R 731 0 R 732 0 R 733 0 R 734 0 R 735 0 R 736 0 R 737 0 R 738 0 R 739 0 R 740 0 R 741 0 R 742 0 R 743 0 R 744 0 R 745 0 R 746 0 R 748 0 R 772 0 R 749 0 R 750 0 R 773 0 R 751 0 R 752 0 R 753 0 R 754 0 R 755 0 R 756 0 R 757 0 R 758 0 R 759 0 R 760 0 R 761 0 R 762 0 R 763 0 R 764 0 R 765 0 R 766 0 R 767 0 R 768 0 R 769 0 R 770 0 R 771 0 R 774 0 R 775 0 R 776 0 R 1038 0 R 780 0 R 781 0 R 782 0 R 1039 0 R 790 0 R 809 0 R 791 0 R 792 0 R 793 0 R 794 0 R 795 0 R 796 0\",\n            \"score\": 0.1483684629201889,\n            \"source_ref\": \"notes.md\",\n            \"chunk_index\": 13,\n            \"resource_id\": \"08ba4dfc-d5e9-4c30-aea3-aca15c659c4e\",\n            \"namespace_id\": \"semester 1\"\n        },\n        {\n            \"id\": 908806617613944123,\n            \"text\": \"0 R 442 0 R 443 0 R 444 0 R 445 0 R 446 0 R] 11 [447 0 R 448 0 R 449 0 R 450 0 R 451 0 R 452 0 R 453 0 R 454 0 R 455 0 R 456 0 R 457 0 R 458 0 R 459 0 R 460 0 R 461 0 R 462 0 R 463 0 R 464 0 R 465 0 R 466 0 R 467 0 R] 12 [468 0 R 469 0 R 470 0 R 471 0 R 472 0 R 473 0 R 474 0 R 475 0 R 476 0 R 477 0 R 478 0 R 479 0 R 480 0 R] 13 [481 0 R 482 0 R 483 0 R 484 0 R 485 0 R 486 0 R 487 0 R 488 0 R 489 0 R 490 0 R 491 0 R 492 0 R 493 0 R 494 0 R 495 0 R 496 0 R 497 0 R 498 0 R 499 0 R 500 0 R 501 0 R 502 0 R 503 0 R 504 0 R 505 0 R 506 0 R 507 0 R] 14 [508 0 R 509 0 R 510 0 R 511 0 R 512 0 R 513 0 R 514 0 R 515 0 R 516 0 R 517 0 R 518 0 R 519 0 R 520 0 R 521 0 R 522 0 R 523 0 R 524 0 R 525 0 R 526 0 R 527 0 R 528 0 R 529 0 R 530 0 R 531 0 R 532 0 R 533 0 R 534 0 R 535 0 R 536 0 R 537 0 R 538 0 R 539 0 R 540 0 R 541 0 R 542 0 R 543 0 R 544 0 R 545 0 R 546 0 R 547 0 R 548 0 R 549 0 R 550 0 R 551 0 R 552 0 R 553 0 R 554 0 R] 15 [555 0 R 556 0 R 557 0 R 558 0 R 559 0 R 560 0 R 561 0 R 562 0 R 563 0 R 564 0 R 565 0 R 566 0 R 567 0 R 568 0 R 569 0 R 570 0 R 571 0 R 572 0 R 573 0 R 574 0 R 575 0 R 576 0 R 577 0 R 578 0 R 579 0 R 580 0 R 581 0 R 582 0 R 583 0 R 584 0 R 585 0 R 586 0 R 587 0 R 588 0 R 589 0 R 590 0 R 591 0 R 592 0 R 593 0 R 594 0 R] 16 [595 0 R 596 0 R 597 0 R 598 0 R 599 0 R 600 0 R 601 0 R 602 0 R 603 0 R 604 0 R 605 0 R 606 0 R 607 0 R 608 0 R 609 0 R\",\n            \"score\": 0.14794236421585083,\n            \"source_ref\": \"notes.md\",\n            \"chunk_index\": 8,\n            \"resource_id\": \"08ba4dfc-d5e9-4c30-aea3-aca15c659c4e\",\n            \"namespace_id\": \"semester 1\"\n        }\n    ],\n    \"response_ms\": 1324,\n    \"llm_profile\": \"balanced\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "search-kb-scope-legacy",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"kb_id\": \"{{kb_id}}\",\n  \"query\": \"how do we deploy payments service\",\n  \"top_k\": 3\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/search",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "search"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "search-kb-scope-legacy",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"kb_id\": \"{{kb_id}}\",\n  \"query\": \"how do we deploy payments service\",\n  \"top_k\": 3\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/search",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "search"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "date",
+                  "value": "Wed, 15 Apr 2026 09:50:09 GMT"
+                },
+                {
+                  "key": "server",
+                  "value": "uvicorn"
+                },
+                {
+                  "key": "content-length",
+                  "value": "307"
+                },
+                {
+                  "key": "content-type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"kb_id\": \"a462f351-ff40-47c9-9033-d998f98030a3\",\n    \"results\": [\n        {\n            \"id\": 8011582596604109,\n            \"text\": \"# Deploy Notes 1. Merge to main 2. Wait for CI 3. Release\",\n            \"score\": 0.29501640796661377,\n            \"source_ref\": \"deploy-notes.md\",\n            \"chunk_index\": 0,\n            \"resource_id\": \"b5907040-24de-44e8-8ec9-5bdc3c5af91b\",\n            \"namespace_id\": \"semester 1\"\n        }\n    ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "query-kb-scope-legacy",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"kb_id\": \"{{kb_id}}\",\n  \"question\": \"How do we deploy the payments service?\",\n  \"top_k\": 3\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/query",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "query"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "query-kb-scope-legacy",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"kb_id\": \"{{kb_id}}\",\n  \"question\": \"How do we deploy the payments service?\",\n  \"top_k\": 3\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/query",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "query"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "date",
+                  "value": "Wed, 15 Apr 2026 09:50:26 GMT"
+                },
+                {
+                  "key": "server",
+                  "value": "uvicorn"
+                },
+                {
+                  "key": "content-length",
+                  "value": "329"
+                },
+                {
+                  "key": "content-type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"answer\": \"I don't know.\",\n    \"sources\": [\n        {\n            \"id\": 8011582596604109,\n            \"text\": \"# Deploy Notes 1. Merge to main 2. Wait for CI 3. Release\",\n            \"score\": 0.30502957105636597,\n            \"source_ref\": \"deploy-notes.md\",\n            \"chunk_index\": 0,\n            \"resource_id\": \"b5907040-24de-44e8-8ec9-5bdc3c5af91b\",\n            \"namespace_id\": \"semester 1\"\n        }\n    ],\n    \"response_ms\": 1113,\n    \"llm_profile\": \"balanced\"\n}"
+            },
+            {
+              "name": "query-kb-scope-legacy",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"kb_id\": \"{{kb_id}}\",\n  \"question\": \"How many subjects we have?\",\n  \"top_k\": 3\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/query",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "query"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "date",
+                  "value": "Wed, 15 Apr 2026 09:51:10 GMT"
+                },
+                {
+                  "key": "server",
+                  "value": "uvicorn"
+                },
+                {
+                  "key": "content-length",
+                  "value": "331"
+                },
+                {
+                  "key": "content-type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"answer\": \"I don't know.\",\n    \"sources\": [\n        {\n            \"id\": 8011582596604109,\n            \"text\": \"# Deploy Notes 1. Merge to main 2. Wait for CI 3. Release\",\n            \"score\": -0.004872029647231102,\n            \"source_ref\": \"deploy-notes.md\",\n            \"chunk_index\": 0,\n            \"resource_id\": \"b5907040-24de-44e8-8ec9-5bdc3c5af91b\",\n            \"namespace_id\": \"semester 1\"\n        }\n    ],\n    \"response_ms\": 1580,\n    \"llm_profile\": \"balanced\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Debug",
+      "item": [
+        {
+          "name": "list-knowledge-bases",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/knowledge-bases?instance_id={{instance_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "knowledge-bases"
+              ],
+              "query": [
+                {
+                  "key": "instance_id",
+                  "value": "{{instance_id}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "collections",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/collections",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "collections"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "collections",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/collections",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "collections"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "date",
+                  "value": "Wed, 15 Apr 2026 09:51:42 GMT"
+                },
+                {
+                  "key": "server",
+                  "value": "uvicorn"
+                },
+                {
+                  "key": "content-length",
+                  "value": "2835"
+                },
+                {
+                  "key": "content-type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"collections\": [\n        \"kb_1742a0f5_d9279404\",\n        \"kb_50d832d6_7fa0e32c\",\n        \"kb_50d832d6_a462f351\",\n        \"kb_7680b38c_64ff2098\",\n        \"kb_a9015790_353f7c05\",\n        \"kb_cb6fcfe4_a1fd1213\",\n        \"rag_demo_17af5853\",\n        \"rag_demo_8e7e31db\"\n    ],\n    \"knowledge_bases\": [\n        {\n            \"id\": \"a1fd1213-e7c2-4ba6-a0a3-16263184f69e\",\n            \"instance_id\": \"cb6fcfe4-1ea7-4c19-922c-35598ac76017\",\n            \"name\": \"Semester 1 KB\",\n            \"namespace_id\": \"semester 1\",\n            \"collection_name\": \"kb_cb6fcfe4_a1fd1213\",\n            \"embedding_model\": \"minilm\",\n            \"embedding_dim\": 384,\n            \"distance_metric\": \"cosine\",\n            \"status\": \"active\",\n            \"created_at\": \"2026-04-15T09:46:31.316415\",\n            \"updated_at\": \"2026-04-15T09:46:31.316415\",\n            \"embedding_profile\": \"general_text_search\",\n            \"llm_profile\": \"balanced\"\n        },\n        {\n            \"id\": \"a462f351-ff40-47c9-9033-d998f98030a3\",\n            \"instance_id\": \"50d832d6-2a01-45ce-9947-bbad59a3fe93\",\n            \"name\": \"Engineering Docs\",\n            \"namespace_id\": \"semester 1\",\n            \"collection_name\": \"kb_50d832d6_a462f351\",\n            \"embedding_model\": \"minilm\",\n            \"embedding_dim\": 384,\n            \"distance_metric\": \"cosine\",\n            \"status\": \"active\",\n            \"created_at\": \"2026-04-15T09:46:06.574883\",\n            \"updated_at\": \"2026-04-15T09:46:06.574883\",\n            \"embedding_profile\": \"general_text_search\",\n            \"llm_profile\": \"balanced\"\n        },\n        {\n            \"id\": \"7fa0e32c-bd4f-42fc-9760-40aad3b9958f\",\n            \"instance_id\": \"50d832d6-2a01-45ce-9947-bbad59a3fe93\",\n            \"name\": \"Engineering Docs\",\n            \"namespace_id\": \"semester 1\",\n            \"collection_name\": \"kb_50d832d6_7fa0e32c\",\n            \"embedding_model\": \"minilm\",\n            \"embedding_dim\": 384,\n            \"distance_metric\": \"cosine\",\n            \"status\": \"active\",\n            \"created_at\": \"2026-04-15T09:38:10.306311\",\n            \"updated_at\": \"2026-04-15T09:38:10.306311\",\n            \"embedding_profile\": \"general_text_search\",\n            \"llm_profile\": \"balanced\"\n        },\n        {\n            \"id\": \"d9279404-3568-4581-a1ba-97ae5b2331e3\",\n            \"instance_id\": \"1742a0f5-d2e7-454d-aed7-e48fd809e4cb\",\n            \"name\": \"Engineering Docs\",\n            \"namespace_id\": \"company_docs\",\n            \"collection_name\": \"kb_1742a0f5_d9279404\",\n            \"embedding_model\": \"minilm\",\n            \"embedding_dim\": 384,\n            \"distance_metric\": \"cosine\",\n            \"status\": \"active\",\n            \"created_at\": \"2026-04-14T12:25:54.111921\",\n            \"updated_at\": \"2026-04-14T12:25:54.111921\",\n            \"embedding_profile\": \"general_text_search\",\n            \"llm_profile\": \"balanced\"\n        },\n        {\n            \"id\": \"64ff2098-be2f-4ad7-b70e-843ccd0b0428\",\n            \"instance_id\": \"7680b38c-2132-431c-8d3e-17b4f32c2165\",\n            \"name\": \"Deploy Docs\",\n            \"namespace_id\": \"company_docs\",\n            \"collection_name\": \"kb_7680b38c_64ff2098\",\n            \"embedding_model\": \"minilm\",\n            \"embedding_dim\": 384,\n            \"distance_metric\": \"cosine\",\n            \"status\": \"active\",\n            \"created_at\": \"2026-04-14T10:47:24.857858\",\n            \"updated_at\": \"2026-04-14T10:47:24.857858\",\n            \"embedding_profile\": \"general_text_search\",\n            \"llm_profile\": \"balanced\"\n        },\n        {\n            \"id\": \"353f7c05-4677-43fc-8b8a-57b298f3e642\",\n            \"instance_id\": \"a9015790-f320-4557-8c73-ad65dd128796\",\n            \"name\": \"Engineering Docs\",\n            \"namespace_id\": \"company_docs\",\n            \"collection_name\": \"kb_a9015790_353f7c05\",\n            \"embedding_model\": \"minilm\",\n            \"embedding_dim\": 384,\n            \"distance_metric\": \"cosine\",\n            \"status\": \"active\",\n            \"created_at\": \"2026-04-14T10:45:26.844020\",\n            \"updated_at\": \"2026-04-14T10:45:26.844020\",\n            \"embedding_profile\": \"general_text_search\",\n            \"llm_profile\": \"balanced\"\n        }\n    ]\n}"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000"
+    },
+    {
+      "key": "instance_id",
+      "value": ""
+    },
+    {
+      "key": "namespace_id",
+      "value": "company_docs"
+    },
+    {
+      "key": "kb_id",
+      "value": ""
+    },
+    {
+      "key": "resource_id",
+      "value": ""
+    }
+  ]
+}

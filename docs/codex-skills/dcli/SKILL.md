@@ -220,7 +220,8 @@ dcli ingest-text --source-ref "<source>" --content "<text>" --bot=true
 
 Project-scoped persistence policy:
 - always use a per-project `context-id` to avoid cross-project mixups.
-- recommended default: repo/app slug (example: `demo-test-app`), not `default`.
+- default convention: repo/app folder slug (example: `demo-test-app`), not `default`.
+- if user does not provide one, derive from current project root folder name.
 - pass this same `--context-id` on all commands in a session.
 
 1. Check context:
@@ -249,6 +250,7 @@ dcli instance-create --name "<user_instance_name>" -d "<optional_description>" -
 ```
 
 - if one or more instances exist: show instance names and ask user to choose by name.
+- if duplicate instance names exist: show `id + description + updated_at` for disambiguation and let user choose.
 - resolve chosen name to instance id internally from `instances` JSON.
 - fetch namespaces for the chosen instance:
 
@@ -265,7 +267,8 @@ dcli context-show --context-id "<project_context_id>" --bot=true
 ```
 
 Important:
-- never ask user for raw/random UUIDs.
+- do not ask user for raw/random UUIDs in normal flow.
+- exception: duplicate instance names where disambiguation requires showing ids.
 - always ask using instance names/options and namespace names.
 - use ids only internally for command execution.
 
@@ -305,6 +308,7 @@ Ask user when required:
 
 Avoid asking:
 - for random/raw IDs when options can be listed and chosen semantically
+- except when duplicate instance names require explicit id-based disambiguation
 
 ## Guardrails
 
@@ -313,4 +317,4 @@ Avoid asking:
 - Always confirm after `context-set`.
 - Prefer `search-docs` before `ask-docs` for latency-sensitive lookups.
 - Never invent undocumented APIs/behaviors; retrieve first.
-- Do not show instance IDs in user-facing responses (unless user explicitly requests debug details).
+- Do not show instance IDs in user-facing responses, except for duplicate-name disambiguation or explicit debug requests.

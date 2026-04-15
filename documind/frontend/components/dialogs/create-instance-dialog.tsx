@@ -53,7 +53,7 @@ export function CreateInstanceDialog({
 
   const createMutation = useMutation({
     mutationFn: api.createInstance.bind(api),
-    onSuccess: (data) => {
+    onSuccess: (data: { name: string }) => {
       queryClient.invalidateQueries({ queryKey: ["instances"] });
       toast.success("Instance created", {
         description: `"${data.name}" has been created successfully.`,

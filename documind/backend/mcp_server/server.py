@@ -8,6 +8,70 @@ from .context_store import ActiveContextStore
 from .service import DocuMindMCPService
 
 
+def _validation_error(
+    text: str,
+    *,
+    reason: str,
+    action_required: str,
+    extra_meta: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    meta: dict[str, Any] = {
+        "error": "validation_error",
+        "reason": reason,
+        "action_required": action_required,
+    }
+    if extra_meta:
+        meta.update(extra_meta)
+    return {
+        "status": "error",
+        "data": {},
+        "meta": meta,
+        "text": text,
+    }
+
+
+def _require_create_confirmation(confirm_create: bool) -> dict[str, Any] | None:
+    if confirm_create:
+        return None
+    return _validation_error(
+        "create_instance requires explicit confirmation. Ask the user first, then re-run with confirm_create=true.",
+        reason="confirmation_required",
+        action_required="confirm_create_instance",
+    )
+
+
+def _guard_unknown_namespace(
+    service: DocuMindMCPService,
+    *,
+    instance_id: str,
+    namespace_id: str,
+    context_id: str,
+    allow_unknown_namespace: bool,
+) -> dict[str, Any] | None:
+    if allow_unknown_namespace:
+        return None
+
+    namespace_result = service.list_namespaces(instance_id=instance_id, context_id=context_id)
+    if namespace_result.get("status") != "success":
+        return namespace_result
+
+    namespaces = namespace_result.get("data", {}).get("namespaces", [])
+    if namespace_id.strip() in namespaces:
+        return None
+
+    return _validation_error(
+        "namespace_id was not found for this instance. Ask the user to choose an existing namespace "
+        "or re-run with allow_unknown_namespace=true.",
+        reason="namespace_unknown",
+        action_required="confirm_unknown_namespace",
+        extra_meta={
+            "instance_id": instance_id,
+            "namespace_id": namespace_id,
+            "available_namespaces": namespaces,
+        },
+    )
+
+
 def build_mcp_server():
     try:
         from fastmcp import FastMCP
@@ -30,7 +94,9 @@ def build_mcp_server():
             "Use DocuMind tools to search and query internal documentation. "
             "Use search_docs first for factual lookup (counts, lists, exact values). "
             "Use ask_docs only for synthesis. "
-            "If instance_id/namespace_id are missing, call get_active_context or set_active_context first."
+            "If instance_id/namespace_id are missing, call get_active_context or set_active_context first. "
+            "Never auto-create instances without user confirmation. "
+            "Never set unknown namespaces unless user explicitly confirms."
         ),
     )
 
@@ -97,8 +163,11 @@ def build_mcp_server():
         return service.list_instances()
 
     @mcp.tool()
-    def create_instance(name: str, description: str = "") -> dict[str, Any]:
-        """Create a new instance for first-time setup."""
+    def create_instance(name: str, description: str = "", confirm_create: bool = False) -> dict[str, Any]:
+        """Create a new instance for first-time setup. Requires confirm_create=true."""
+        guard_error = _require_create_confirmation(confirm_create)
+        if guard_error:
+            return guard_error
         return service.create_instance(name=name, description=description)
 
     @mcp.tool()
@@ -112,8 +181,23 @@ def build_mcp_server():
         return service.get_active_context(context_id=context_id)
 
     @mcp.tool()
-    def set_active_context(instance_id: str, namespace_id: str, context_id: str = "") -> dict[str, Any]:
-        """Set active context to be used when instance_id/namespace_id are omitted."""
+    def set_active_context(
+        instance_id: str,
+        namespace_id: str,
+        context_id: str = "",
+        allow_unknown_namespace: bool = False,
+    ) -> dict[str, Any]:
+        """Set active context. Unknown namespaces require allow_unknown_namespace=true."""
+        guard_error = _guard_unknown_namespace(
+            service,
+            instance_id=instance_id,
+            namespace_id=namespace_id,
+            context_id=context_id,
+            allow_unknown_namespace=allow_unknown_namespace,
+        )
+        if guard_error:
+            return guard_error
+
         return service.set_active_context(
             instance_id=instance_id,
             namespace_id=namespace_id,

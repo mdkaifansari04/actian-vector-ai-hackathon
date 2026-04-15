@@ -1,49 +1,49 @@
-'use client'
+"use client";
 
-import { useQuery } from '@tanstack/react-query'
-import Link from 'next/link'
-import { Database, Copy } from 'lucide-react'
-import { toast } from 'sonner'
+import { useQuery } from "@tanstack/react-query";
+import Link from "next/link";
+import { Database, Copy } from "lucide-react";
+import { toast } from "sonner";
 import {
   Sheet,
   SheetContent,
   SheetDescription,
   SheetHeader,
   SheetTitle,
-} from '@/components/ui/sheet'
-import { Skeleton } from '@/components/ui/skeleton'
-import { useAppContext } from '@/lib/context'
-import api from '@/lib/api'
-import { formatDateTime } from '@/lib/format'
-import type { Instance } from '@/lib/types'
+} from "@/components/ui/sheet";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useAppContext } from "@/lib/context";
+import api from "@/lib/api";
+import { formatDateTime } from "@/lib/format";
+import type { Instance } from "@/lib/types";
 
 interface InstanceDetailSheetProps {
-  instance: Instance | null
-  onClose: () => void
+  instance: Instance | null;
+  onClose: () => void;
 }
 
 export function InstanceDetailSheet({
   instance,
   onClose,
 }: InstanceDetailSheetProps) {
-  const { activeInstanceId, setActiveInstance } = useAppContext()
+  const { activeInstanceId, setActiveInstance } = useAppContext();
 
   const { data: knowledgeBases, isLoading: loadingKbs } = useQuery({
-    queryKey: ['knowledge-bases', instance?.id],
+    queryKey: ["knowledge-bases", instance?.id],
     queryFn: () => api.getKnowledgeBases(instance?.id),
     enabled: !!instance,
-  })
+  });
 
   const namespaces = knowledgeBases
     ? [...new Set(knowledgeBases.map((kb) => kb.namespace_id))]
-    : []
+    : [];
 
   const copyId = () => {
     if (instance) {
-      navigator.clipboard.writeText(instance.id)
-      toast.success('Instance ID copied to clipboard')
+      navigator.clipboard.writeText(instance.id);
+      toast.success("Instance ID copied to clipboard");
     }
-  }
+  };
 
   return (
     <Sheet open={!!instance} onOpenChange={(open) => !open && onClose()}>
@@ -53,9 +53,11 @@ export function InstanceDetailSheet({
             <SheetHeader className="px-6 pt-6 pb-0">
               <div className="flex items-start justify-between">
                 <div>
-                  <SheetTitle className="text-sm font-medium text-white">{instance.name}</SheetTitle>
+                  <SheetTitle className="text-sm font-medium text-white">
+                    {instance.name}
+                  </SheetTitle>
                   <SheetDescription className="mt-1 text-xs text-muted-foreground/50">
-                    {instance.description || 'No description provided'}
+                    {instance.description || "No description provided"}
                   </SheetDescription>
                 </div>
                 {activeInstanceId === instance.id ? (
@@ -65,7 +67,9 @@ export function InstanceDetailSheet({
                   </span>
                 ) : (
                   <button
-                    onClick={() => setActiveInstance(instance.id, instance.name)}
+                    onClick={() =>
+                      setActiveInstance(instance.id, instance.name)
+                    }
                     className="h-7 rounded-lg px-3 text-[11px] font-medium text-muted-foreground/50 transition-colors hover:bg-white/6 hover:text-white"
                   >
                     Set Active
@@ -77,7 +81,9 @@ export function InstanceDetailSheet({
             <div className="mt-6 space-y-0 px-6 pb-6">
               {/* Instance Details */}
               <div className="rounded-xl border border-white/6 bg-black p-4">
-                <h3 className="mb-3 text-[11px] font-medium uppercase tracking-wide text-muted-foreground/50">Details</h3>
+                <h3 className="mb-3 text-[11px] font-medium uppercase tracking-wide text-muted-foreground/50">
+                  Details
+                </h3>
                 <dl className="space-y-2.5 text-xs">
                   <div className="flex items-center justify-between">
                     <dt className="text-muted-foreground/40">ID</dt>
@@ -93,11 +99,15 @@ export function InstanceDetailSheet({
                   </div>
                   <div className="flex justify-between">
                     <dt className="text-muted-foreground/40">Created</dt>
-                    <dd className="tabular-nums text-white/70">{formatDateTime(instance.created_at)}</dd>
+                    <dd className="tabular-nums text-white/70">
+                      {formatDateTime(instance.created_at)}
+                    </dd>
                   </div>
                   <div className="flex justify-between">
                     <dt className="text-muted-foreground/40">Updated</dt>
-                    <dd className="tabular-nums text-white/70">{formatDateTime(instance.updated_at)}</dd>
+                    <dd className="tabular-nums text-white/70">
+                      {formatDateTime(instance.updated_at)}
+                    </dd>
                   </div>
                 </dl>
               </div>
@@ -117,7 +127,10 @@ export function InstanceDetailSheet({
                 ) : namespaces.length > 0 ? (
                   <div className="flex flex-wrap gap-1.5">
                     {namespaces.map((ns) => (
-                      <span key={ns} className="rounded-md border border-white/6 bg-white/3 px-2 py-1 text-[11px] text-white/60">
+                      <span
+                        key={ns}
+                        className="rounded-md border border-white/6 bg-white/3 px-2 py-1 text-[11px] text-white/60"
+                      >
                         {ns}
                       </span>
                     ))}
@@ -147,7 +160,10 @@ export function InstanceDetailSheet({
                 {loadingKbs ? (
                   <div className="space-y-2">
                     {[1, 2, 3].map((i) => (
-                      <Skeleton key={i} className="h-14 w-full rounded-lg bg-white/3" />
+                      <Skeleton
+                        key={i}
+                        className="h-14 w-full rounded-lg bg-white/3"
+                      />
                     ))}
                   </div>
                 ) : knowledgeBases && knowledgeBases.length > 0 ? (
@@ -160,7 +176,9 @@ export function InstanceDetailSheet({
                         <div className="flex items-center gap-2.5">
                           <Database className="h-3.5 w-3.5 text-muted-foreground/30" />
                           <div>
-                            <p className="text-xs font-medium text-white/80">{kb.name}</p>
+                            <p className="text-xs font-medium text-white/80">
+                              {kb.name}
+                            </p>
                             <p className="text-[10px] text-muted-foreground/35">
                               {kb.namespace_id}
                             </p>
@@ -188,5 +206,5 @@ export function InstanceDetailSheet({
         )}
       </SheetContent>
     </Sheet>
-  )
+  );
 }

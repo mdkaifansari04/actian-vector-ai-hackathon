@@ -1,10 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { useMutation } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
 import {
   MessageCircleQuestion,
   Loader2,
@@ -47,16 +45,13 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { Skeleton } from '@/components/ui/skeleton'
 import { FieldGroup, Field, FieldLabel, FieldError } from '@/components/ui/field'
 import { PageHeader } from '@/components/page-header'
+import {
+  useQueryAdvancedMutation,
+  useQueryInstanceMutation,
+} from '@/hooks/mutations'
 import { useAppContext } from '@/lib/context'
-import api from '@/lib/api'
-import type { QueryInstanceResponse, ApiError, FilterClause } from '@/lib/types'
-
-const askSchema = z.object({
-  question: z.string().min(1, 'Question is required'),
-  top_k: z.number().min(1).max(50).default(5),
-})
-
-type AskForm = z.infer<typeof askSchema>
+import type { QueryInstanceResponse, FilterClause } from '@/lib/types'
+import { askSchema, type AskBody } from '@/utils/validations'
 
 export default function AskPage() {
   const {
@@ -78,8 +73,12 @@ export default function AskPage() {
   const [denseWeight, setDenseWeight] = useState(0.7)
   const [keywordWeight, setKeywordWeight] = useState(0.3)
   const [filters, setFilters] = useState<FilterClause[]>([])
+  const queryInstanceMutation = useQueryInstanceMutation()
+  const queryAdvancedMutation = useQueryAdvancedMutation()
+  const isAsking =
+    queryInstanceMutation.isPending || queryAdvancedMutation.isPending
 
-  const form = useForm<AskForm>({
+  const form = useForm<AskBody>({
     resolver: zodResolver(askSchema),
     defaultValues: {
       question: '',
@@ -87,14 +86,26 @@ export default function AskPage() {
     },
   })
 
-  const askMutation = useMutation({
-    mutationFn: async (data: AskForm) => {
-      if (!activeInstanceId || !activeNamespaceId) {
-        throw new Error('Context not set')
-      }
+  const onSubmit = (data: AskBody) => {
+    if (!activeInstanceId || !activeNamespaceId) {
+      toast.error('Query failed', {
+        description: 'Context not set',
+      })
+      return
+    }
 
-      if (advancedOpen) {
-        return api.queryAdvanced({
+    const onSuccess = (next: QueryInstanceResponse) => {
+      setResponse(next)
+    }
+    const onError = (error: Error) => {
+      toast.error('Query failed', {
+        description: error.message,
+      })
+    }
+
+    if (advancedOpen) {
+      queryAdvancedMutation.mutate(
+        {
           instance_id: activeInstanceId,
           namespace_id: activeNamespaceId,
           question: data.question,
@@ -109,28 +120,21 @@ export default function AskPage() {
                 }
               : undefined,
           filters: filters.length > 0 ? { must: filters } : undefined,
-        })
-      }
+        },
+        { onSuccess, onError }
+      )
+      return
+    }
 
-      return api.queryInstance({
+    queryInstanceMutation.mutate(
+      {
         instance_id: activeInstanceId,
         namespace_id: activeNamespaceId,
         question: data.question,
         top_k: data.top_k,
-      })
-    },
-    onSuccess: (data) => {
-      setResponse(data)
-    },
-    onError: (error: ApiError) => {
-      toast.error('Query failed', {
-        description: error.message,
-      })
-    },
-  })
-
-  const onSubmit = (data: AskForm) => {
-    askMutation.mutate(data)
+      },
+      { onSuccess, onError }
+    )
   }
 
   const toggleSourceExpand = (id: string | number) => {
@@ -238,9 +242,9 @@ export default function AskPage() {
                       type="submit"
                       size="sm"
                       className="h-8 rounded-lg text-xs"
-                      disabled={askMutation.isPending}
+                      disabled={isAsking}
                     >
-                      {askMutation.isPending && (
+                      {isAsking && (
                         <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
                       )}
                       <MessageCircleQuestion className="mr-2 h-3.5 w-3.5" />
@@ -447,7 +451,7 @@ export default function AskPage() {
           </Collapsible>
 
           {/* Answer Panel */}
-          {(askMutation.isPending || response) && (
+          {(isAsking || response) && (
             <Card className="border-white/6 bg-[#111]">
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
@@ -469,7 +473,7 @@ export default function AskPage() {
                 </div>
               </CardHeader>
               <CardContent>
-                {askMutation.isPending ? (
+                {isAsking ? (
                   <div className="space-y-2">
                     <Skeleton className="h-4 w-full" />
                     <Skeleton className="h-4 w-3/4" />
@@ -508,7 +512,7 @@ export default function AskPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {askMutation.isPending ? (
+            {isAsking ? (
               <div className="space-y-3">
                 {Array.from({ length: 3 }).map((_, i) => (
                   <Skeleton key={i} className="h-24 w-full rounded-lg bg-white/3" />

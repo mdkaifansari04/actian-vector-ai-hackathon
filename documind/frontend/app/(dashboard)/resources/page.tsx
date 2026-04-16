@@ -1,12 +1,16 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import {
   AlertCircle,
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
   FileText,
   Link2,
   Loader2,
@@ -119,6 +123,8 @@ export default function ResourcesPage() {
     CrawlPreviewLinkItem[]
   >([]);
   const [selectedLinks, setSelectedLinks] = useState<string[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
 
   const ingestMutation = useIngestResource();
   const uploadMutation = useUploadResource();
@@ -318,6 +324,27 @@ export default function ResourcesPage() {
     setSelectedLinks(highConfidenceUrls);
   };
 
+  const totalResources = resources?.length ?? 0;
+  const totalPages = Math.max(1, Math.ceil(totalResources / pageSize));
+  const paginatedResources = useMemo(() => {
+    if (!resources?.length) return [];
+    const start = (currentPage - 1) * pageSize;
+    return resources.slice(start, start + pageSize);
+  }, [currentPage, pageSize, resources]);
+  const rangeStart =
+    totalResources === 0 ? 0 : (currentPage - 1) * pageSize + 1;
+  const rangeEnd = Math.min(currentPage * pageSize, totalResources);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [pageSize]);
+
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    }
+  }, [currentPage, totalPages]);
+
   if (!hasContext && !hasResourceScope) {
     return (
       <div className="mx-auto max-w-5xl px-6 py-6">
@@ -333,10 +360,12 @@ export default function ResourcesPage() {
             strokeWidth={1.5}
           />
           <div>
-            <p className="text-xs font-medium text-white/80">Context Required</p>
+            <p className="text-xs font-medium text-white/80">
+              Context Required
+            </p>
             <p className="mt-0.5 text-[11px] text-muted-foreground/40">
-              Select an instance and namespace from the top bar, or open this page
-              from a knowledge base detail sheet.
+              Select an instance and namespace from the top bar, or open this
+              page from a knowledge base detail sheet.
             </p>
           </div>
         </div>
@@ -613,10 +642,12 @@ export default function ResourcesPage() {
         <TabsContent value="links">
           <div className="rounded-xl border border-white/6 bg-[#111]">
             <div className="px-5 py-4">
-              <h2 className="text-sm font-medium text-white">Ingest Link Resources</h2>
+              <h2 className="text-sm font-medium text-white">
+                Ingest Link Resources
+              </h2>
               <p className="mt-0.5 text-xs text-muted-foreground/40">
-                Crawl documentation links, review discovered pages, and ingest selected
-                content into the current scope.
+                Crawl documentation links, review discovered pages, and ingest
+                selected content into the current scope.
               </p>
             </div>
             <div className="border-t border-white/6 px-5 py-5">
@@ -672,7 +703,9 @@ export default function ResourcesPage() {
                       placeholder="/docs or /docs/svelte"
                       value={crawlScopePath}
                       disabled={crawlScopeMode === "same_domain"}
-                      onChange={(event) => setCrawlScopePath(event.target.value)}
+                      onChange={(event) =>
+                        setCrawlScopePath(event.target.value)
+                      }
                       className="h-8 rounded-lg border-white/6 bg-white/3 text-xs placeholder:text-muted-foreground/25 focus-visible:border-white/12 focus-visible:ring-0 disabled:cursor-not-allowed disabled:opacity-50"
                     />
                   </Field>
@@ -684,9 +717,13 @@ export default function ResourcesPage() {
                   </FieldLabel>
                   <Textarea
                     rows={3}
-                    placeholder={"https://docs.example.com/guide\nhttps://docs.example.com/reference"}
+                    placeholder={
+                      "https://docs.example.com/guide\nhttps://docs.example.com/reference"
+                    }
                     value={additionalSeedUrls}
-                    onChange={(event) => setAdditionalSeedUrls(event.target.value)}
+                    onChange={(event) =>
+                      setAdditionalSeedUrls(event.target.value)
+                    }
                     className="rounded-lg border-white/6 bg-white/3 text-xs placeholder:text-muted-foreground/25 focus-visible:border-white/12 focus-visible:ring-0"
                   />
                 </Field>
@@ -868,13 +905,13 @@ export default function ResourcesPage() {
                   </div>
                 ))
               ) : resources && resources.length > 0 ? (
-                resources.map((resource, index) => {
+                paginatedResources.map((resource, index) => {
                   const style =
                     STATUS_STYLES[resource.status] || STATUS_STYLES.processing;
                   return (
                     <div
                       key={resource.id}
-                      className={`group grid grid-cols-[1.5fr_0.6fr_0.5fr_0.6fr_0.8fr] items-center gap-2 bg-[#141414] px-4 py-3 transition-colors duration-150 hover:bg-white/4 ${index === 0 ? "rounded-t-lg" : ""} ${index === resources.length - 1 ? "rounded-b-lg" : ""}`}
+                      className={`group grid grid-cols-[1.5fr_0.6fr_0.5fr_0.6fr_0.8fr] items-center gap-2 bg-[#141414] px-4 py-3 transition-colors duration-150 hover:bg-white/4 ${index === 0 ? "rounded-t-lg" : ""}`}
                       style={{ animationDelay: `${index * 0.04}s` }}
                     >
                       <div className="flex min-w-0 items-center gap-2.5">
@@ -918,13 +955,114 @@ export default function ResourcesPage() {
                       strokeWidth={1.5}
                     />
                   </div>
-                  <p className="text-sm text-muted-foreground">No resources yet</p>
+                  <p className="text-sm text-muted-foreground">
+                    No resources yet
+                  </p>
                   <p className="mt-0.5 text-xs text-muted-foreground/40">
-                    Ingest content, upload files, or crawl docs links to add resources
+                    Ingest content, upload files, or crawl docs links to add
+                    resources
                   </p>
                 </div>
               )}
             </div>
+
+            {!loadingResources && totalResources > 0 && (
+              <div className="border-t border-white/6 bg-[#101010] px-4 py-2.5">
+                <div className="flex flex-wrap items-center justify-between gap-2.5">
+                  <div className="flex flex-wrap items-center gap-2.5 text-[11px] text-muted-foreground/60">
+                    <span className="tabular-nums">
+                      {rangeStart}-{rangeEnd} of {totalResources}
+                    </span>
+                    <span className="hidden h-4 w-px bg-white/6 sm:block" />
+                    <div className="flex items-center gap-1.5">
+                      <span>Results per page</span>
+                      <Select
+                        value={String(pageSize)}
+                        onValueChange={(value) => setPageSize(Number(value))}
+                      >
+                        <SelectTrigger className="h-7 w-16 rounded-md border-white/8 bg-white/6 px-2 text-[11px] text-white focus:ring-0">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className="rounded-lg border-white/8 bg-[#1a1a1a] p-1">
+                          <SelectItem
+                            value="10"
+                            className="rounded-md px-2 py-1.5 text-[11px]"
+                          >
+                            10
+                          </SelectItem>
+                          <SelectItem
+                            value="20"
+                            className="rounded-md px-2 py-1.5 text-[11px]"
+                          >
+                            20
+                          </SelectItem>
+                          <SelectItem
+                            value="50"
+                            className="rounded-md px-2 py-1.5 text-[11px]"
+                          >
+                            50
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  <div className="ml-auto flex items-center gap-1.5">
+                    <div className="flex items-center gap-1">
+                      <button
+                        type="button"
+                        onClick={() => setCurrentPage(1)}
+                        disabled={currentPage === 1}
+                        className="flex h-7 w-7 items-center justify-center rounded-md bg-white/6 text-muted-foreground/45 transition-colors hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-35"
+                        aria-label="First page"
+                      >
+                        <ChevronsLeft className="h-3 w-3" strokeWidth={1.5} />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setCurrentPage((page) => Math.max(1, page - 1))
+                        }
+                        disabled={currentPage === 1}
+                        className="flex h-7 w-7 items-center justify-center rounded-md bg-white/6 text-muted-foreground/45 transition-colors hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-35"
+                        aria-label="Previous page"
+                      >
+                        <ChevronLeft className="h-3 w-3" strokeWidth={1.5} />
+                      </button>
+                    </div>
+
+                    <div className="min-w-11 text-center text-xs font-medium tabular-nums text-white/90">
+                      {currentPage}/{totalPages}
+                    </div>
+
+                    <div className="flex items-center gap-1">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setCurrentPage((page) =>
+                            Math.min(totalPages, page + 1),
+                          )
+                        }
+                        disabled={currentPage === totalPages}
+                        className="flex h-7 w-7 items-center justify-center rounded-md bg-white/6 text-muted-foreground/45 transition-colors hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-35"
+                        aria-label="Next page"
+                      >
+                        <ChevronRight className="h-3 w-3" strokeWidth={1.5} />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setCurrentPage(totalPages)}
+                        disabled={currentPage === totalPages}
+                        className="flex h-7 w-7 items-center justify-center rounded-md bg-white/6 text-muted-foreground/45 transition-colors hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-35"
+                        aria-label="Last page"
+                      >
+                        <ChevronsRight className="h-3 w-3" strokeWidth={1.5} />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </TabsContent>
       </Tabs>

@@ -1,11 +1,22 @@
 import type { Metadata } from "next";
-import { Geist_Mono } from "next/font/google";
+import localFont from "next/font/local";
 import { Analytics } from "@vercel/analytics/next";
 import { ThemeProvider } from "@/components/theme-provider";
 import "./globals.css";
 
-const geistMono = Geist_Mono({
-  subsets: ["latin"],
+const docsMono = localFont({
+  src: [
+    {
+      path: "../public/fonts/Satoshi-Medium.otf",
+      weight: "500",
+      style: "normal",
+    },
+    {
+      path: "../public/fonts/Satoshi-Bold.otf",
+      weight: "700",
+      style: "normal",
+    },
+  ],
   variable: "--font-geist-mono",
 });
 
@@ -41,7 +52,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={geistMono.variable}
+      className={docsMono.variable}
       suppressHydrationWarning
       data-scroll-behavior="smooth"
     >

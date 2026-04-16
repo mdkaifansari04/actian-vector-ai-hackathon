@@ -1,6 +1,5 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import {
   Server,
@@ -13,9 +12,14 @@ import {
   MessageCircleQuestion,
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
-import api from "@/lib/api";
 import { useAppContext } from "@/lib/context";
 import { formatDistanceToNow } from "@/lib/format";
+import {
+  useCollections,
+  useHealth,
+  useInstances,
+  useKnowledgeBases,
+} from "@/hooks/queries";
 
 function StatCard({
   title,
@@ -58,25 +62,13 @@ function StatCard({
 export default function OverviewPage() {
   const { hasContext, activeInstanceName, activeNamespaceId } = useAppContext();
 
-  const { data: instances, isLoading: loadingInstances } = useQuery({
-    queryKey: ["instances"],
-    queryFn: () => api.getInstances(),
-  });
+  const { data: instances, isLoading: loadingInstances } = useInstances();
 
-  const { data: knowledgeBases, isLoading: loadingKbs } = useQuery({
-    queryKey: ["knowledge-bases"],
-    queryFn: () => api.getKnowledgeBases(),
-  });
+  const { data: knowledgeBases, isLoading: loadingKbs } = useKnowledgeBases();
 
-  const { data: collections, isLoading: loadingCollections } = useQuery({
-    queryKey: ["collections"],
-    queryFn: () => api.getCollections(),
-  });
+  const { data: collections, isLoading: loadingCollections } = useCollections();
 
-  const { data: health, isLoading: loadingHealth } = useQuery({
-    queryKey: ["health"],
-    queryFn: () => api.getHealth(),
-  });
+  const { data: health, isLoading: loadingHealth } = useHealth();
 
   const uniqueNamespaces = knowledgeBases
     ? [...new Set(knowledgeBases.map((kb) => kb.namespace_id))]

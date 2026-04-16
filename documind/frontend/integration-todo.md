@@ -7,40 +7,40 @@
 
 ## Progress
 
-- Overall: `0%` (0/4 phases done)
-- Current phase: `Phase 1`
+- Overall: `25%` (1/4 phases done)
+- Current phase: `Phase 2`
 - Last updated: `2026-04-16`
 
 ---
 
 ## Phase 1: Data Access + Validation Foundation
 
-- [ ] Create `data-access/` structure:
-  - [ ] `data-access/data-types.ts`
-  - [ ] `data-access/interceptor.ts`
-  - [ ] Domain files (`instances.ts`, `knowledge-bases.ts`, `resources.ts`, `query.ts`, `system.ts`)
-- [ ] Add one Axios instance per backend domain with shared interceptor.
-- [ ] Define shared `ApiResponse<T>` and domain entity types.
-- [ ] Add/align `utils/validations.ts` with Zod schemas for all write payloads.
-- [ ] Ensure each data-access function returns unwrapped `data.body`.
+- [x] Create `data-access/` structure:
+  - [x] `data-access/data-types.ts`
+  - [x] `data-access/interceptor.ts`
+  - [x] Domain files (`instances.ts`, `knowledge-bases.ts`, `resources.ts`, `query.ts`, `system.ts`)
+- [x] Add one Axios instance per backend domain with shared interceptor.
+- [x] Define shared `ApiResponse<T>` and domain entity types.
+- [x] Add/align `utils/validations.ts` with Zod schemas for all write payloads.
+- [x] Ensure each data-access function returns unwrapped `data.body`.
 
 Exit criteria:
-- [ ] No UI components directly call Axios/fetch.
-- [ ] Zod types are used by write functions.
+- [x] No UI components directly call Axios/fetch.
+- [x] Zod types are used by write functions.
 
 ---
 
 ## Phase 2: Query/Mutation Hooks + QueryWrapper
 
-- [ ] Create/standardize `hooks/queries.ts` for all read operations.
-- [ ] Create/standardize `hooks/mutations.ts` for all write operations.
-- [ ] Add stable query keys and `enabled` guards for dependent params.
-- [ ] Add/standardize `components/query-wrapper.tsx`.
+- [x] Create/standardize `hooks/queries.ts` for all read operations.
+- [x] Create/standardize `hooks/mutations.ts` for all write operations.
+- [x] Add stable query keys and `enabled` guards for dependent params.
+- [x] Add/standardize `components/query-wrapper.tsx`.
 - [ ] Update pages to consume hooks + `QueryWrapper` (no repeated loading/error branches).
 
 Exit criteria:
-- [ ] Reads go through `useQuery` hooks only.
-- [ ] Writes go through `useMutation` hooks only.
+- [x] Reads go through `useQuery` hooks only.
+- [x] Writes go through `useMutation` hooks only.
 - [ ] Loading/error/success rendering is consistent across pages.
 
 ---
@@ -86,3 +86,4 @@ Exit criteria:
 
 - Mark each checkbox as work completes.
 - If a task is skipped, add one-line reason below it.
+- `bun run lint` is currently blocked because `eslint` is not installed in this project setup.

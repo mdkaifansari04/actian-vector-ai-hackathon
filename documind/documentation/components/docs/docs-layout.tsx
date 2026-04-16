@@ -1,37 +1,38 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useMemo, ReactNode } from 'react';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { useTheme } from 'next-themes';
-import { 
-  Menu, 
+import { useState, useEffect, useMemo, ReactNode } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { usePathname } from "next/navigation";
+import { useTheme } from "next-themes";
+import {
+  Menu,
   X,
-  Book, 
-  Rocket, 
-  Layers, 
-  Box, 
-  Terminal, 
-  Server, 
-  CheckCircle, 
+  Book,
+  Rocket,
+  Layers,
+  Box,
+  Terminal,
+  Server,
+  CheckCircle,
   Target,
   Moon,
   Sun,
   ChevronDown,
-  ChevronRight
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { navItems, tocItemsMap, type TocItem } from '@/lib/docs-data';
+  ChevronRight,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+import { navItems, tocItemsMap, type TocItem } from "@/lib/docs-data";
 
 const iconMap: Record<string, React.ElementType> = {
-  'book': Book,
-  'rocket': Rocket,
-  'layers': Layers,
-  'box': Box,
-  'terminal': Terminal,
-  'server': Server,
-  'check-circle': CheckCircle,
-  'target': Target,
+  book: Book,
+  rocket: Rocket,
+  layers: Layers,
+  box: Box,
+  terminal: Terminal,
+  server: Server,
+  "check-circle": CheckCircle,
+  target: Target,
 };
 
 interface DocsLayoutProps {
@@ -42,9 +43,15 @@ interface DocsLayoutProps {
   breadcrumbs?: { label: string; href?: string }[];
 }
 
-export function DocsLayout({ children, pageId = 'overview', title, description, breadcrumbs }: DocsLayoutProps) {
+export function DocsLayout({
+  children,
+  pageId = "overview",
+  title,
+  description,
+  breadcrumbs,
+}: DocsLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [activeSection, setActiveSection] = useState('');
+  const [activeSection, setActiveSection] = useState("");
   const { setTheme, resolvedTheme } = useTheme();
   const pathname = usePathname();
 
@@ -56,7 +63,7 @@ export function DocsLayout({ children, pageId = 'overview', title, description, 
 
     const observerOptions = {
       root: null,
-      rootMargin: '-100px 0px -60% 0px',
+      rootMargin: "-100px 0px -60% 0px",
       threshold: 0,
     };
 
@@ -68,7 +75,10 @@ export function DocsLayout({ children, pageId = 'overview', title, description, 
       });
     };
 
-    const observer = new IntersectionObserver(observerCallback, observerOptions);
+    const observer = new IntersectionObserver(
+      observerCallback,
+      observerOptions,
+    );
 
     tocItems.forEach((item) => {
       const element = document.getElementById(item.id);
@@ -83,13 +93,13 @@ export function DocsLayout({ children, pageId = 'overview', title, description, 
   const handleTocClick = (id: string) => {
     const element = document.getElementById(id);
     if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
+      element.scrollIntoView({ behavior: "smooth" });
       setActiveSection(id);
     }
   };
 
   const toggleTheme = () => {
-    setTheme(resolvedTheme === 'dark' ? 'light' : 'dark');
+    setTheme(resolvedTheme === "dark" ? "light" : "dark");
   };
 
   return (
@@ -105,19 +115,24 @@ export function DocsLayout({ children, pageId = 'overview', title, description, 
             >
               <Menu className="w-5 h-5 text-foreground" />
             </button>
-            <Link href="/docs" className="flex items-center gap-2">
-              <div className="w-6 h-6 rounded-md bg-gradient-to-br from-poof-accent to-poof-violet flex items-center justify-center">
-                <span className="text-white font-bold text-xs">D</span>
-              </div>
+            <Link href="/docs" className="hidden lg:flex items-center gap-1">
+              <Image
+                src="/images/logo.png"
+                alt="DocuMind"
+                width={40}
+                height={40}
+                className="rounded-md"
+              />
               <span className="font-semibold text-foreground">DocuMind</span>
             </Link>
+            <span className="block lg:hidden font-semibold text-foreground">DocuMind</span>
           </div>
           <button
             onClick={toggleTheme}
             className="p-2 rounded-lg hover:bg-secondary transition-colors"
             aria-label="Toggle theme"
           >
-            {resolvedTheme === 'dark' ? (
+            {resolvedTheme === "dark" ? (
               <Sun className="w-5 h-5 text-foreground" />
             ) : (
               <Moon className="w-5 h-5 text-foreground" />
@@ -128,7 +143,7 @@ export function DocsLayout({ children, pageId = 'overview', title, description, 
 
       {/* Mobile Sidebar Overlay */}
       {sidebarOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
@@ -139,21 +154,27 @@ export function DocsLayout({ children, pageId = 'overview', title, description, 
         {/* Left Sidebar */}
         <aside
           className={cn(
-            'fixed top-0 left-0 z-50 h-full w-72 bg-sidebar border-r border-sidebar-border',
-            'transform transition-transform duration-300 ease-out',
-            'lg:sticky lg:top-0 lg:z-30 lg:translate-x-0 lg:h-screen',
-            sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+            "fixed top-0 left-0 z-50 h-full w-72 bg-sidebar border-r border-sidebar-border",
+            "transform transition-transform duration-300 ease-out",
+            "lg:sticky lg:top-0 lg:z-30 lg:translate-x-0 lg:h-screen",
+            sidebarOpen ? "translate-x-0" : "-translate-x-full",
           )}
         >
           <div className="flex flex-col h-full">
             {/* Sidebar Header */}
             <div className="flex items-center justify-between p-5 border-b border-sidebar-border">
-              <Link href="/docs" className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-poof-accent to-poof-violet flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">D</span>
-                </div>
+              <Link href="/docs" className="flex items-center gap-1">
+                <Image
+                  src="/images/logo.png"
+                  alt="DocuMind"
+                  width={45}
+                  height={45}
+                  className="rounded-lg"
+                />
                 <div>
-                  <h1 className="text-base font-bold text-foreground">DocuMind</h1>
+                  <h1 className="text-base font-bold text-foreground">
+                    DocuMind
+                  </h1>
                   <p className="text-xs text-muted-foreground">Documentation</p>
                 </div>
               </Link>
@@ -163,7 +184,7 @@ export function DocsLayout({ children, pageId = 'overview', title, description, 
                   className="hidden lg:flex p-1.5 rounded-md hover:bg-sidebar-accent transition-colors"
                   aria-label="Toggle theme"
                 >
-                  {resolvedTheme === 'dark' ? (
+                  {resolvedTheme === "dark" ? (
                     <Sun className="w-4 h-4 text-muted-foreground" />
                   ) : (
                     <Moon className="w-4 h-4 text-muted-foreground" />
@@ -184,26 +205,29 @@ export function DocsLayout({ children, pageId = 'overview', title, description, 
               <ul className="space-y-1">
                 {navItems.map((item) => {
                   const Icon = iconMap[item.icon] || Book;
-                  const isActive = pathname === item.href || 
-                    (item.href !== '/docs' && pathname?.startsWith(item.href));
-                  
+                  const isActive =
+                    pathname === item.href ||
+                    (item.href !== "/docs" && pathname?.startsWith(item.href));
+
                   return (
                     <li key={item.id}>
                       <Link
                         href={item.href}
                         onClick={() => setSidebarOpen(false)}
                         className={cn(
-                          'w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium',
-                          'transition-all duration-200',
+                          "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium",
+                          "transition-all duration-200",
                           isActive
-                            ? 'bg-sidebar-accent text-foreground'
-                            : 'text-muted-foreground hover:text-foreground hover:bg-sidebar-accent/50'
+                            ? "bg-sidebar-accent text-foreground"
+                            : "text-muted-foreground hover:text-foreground hover:bg-sidebar-accent/50",
                         )}
                       >
-                        <Icon className={cn(
-                          'w-4 h-4 flex-shrink-0',
-                          isActive ? 'text-poof-accent' : ''
-                        )} />
+                        <Icon
+                          className={cn(
+                            "w-4 h-4 flex-shrink-0",
+                            isActive ? "text-poof-accent" : "",
+                          )}
+                        />
                         {item.title}
                         {isActive && (
                           <ChevronRight className="w-4 h-4 ml-auto text-muted-foreground" />
@@ -219,7 +243,9 @@ export function DocsLayout({ children, pageId = 'overview', title, description, 
             <div className="p-4 border-t border-sidebar-border">
               <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-sidebar-accent/30">
                 <div className="w-2 h-2 rounded-full bg-poof-mint animate-pulse" />
-                <span className="text-xs text-muted-foreground">v1.0.0 - Hackathon Build</span>
+                <span className="text-xs text-muted-foreground">
+                  v1.0.0 - Hackathon Build
+                </span>
               </div>
             </div>
           </div>
@@ -237,7 +263,10 @@ export function DocsLayout({ children, pageId = 'overview', title, description, 
                     <span key={index} className="flex items-center gap-2">
                       {index > 0 && <span>/</span>}
                       {crumb.href ? (
-                        <Link href={crumb.href} className="hover:text-foreground transition-colors">
+                        <Link
+                          href={crumb.href}
+                          className="hover:text-foreground transition-colors"
+                        >
                           {crumb.label}
                         </Link>
                       ) : (
@@ -276,24 +305,26 @@ export function DocsLayout({ children, pageId = 'overview', title, description, 
                     <ul className="space-y-1">
                       {tocItems.map((item, index) => {
                         const isActive = activeSection === item.id;
-                        
+
                         return (
                           <li key={item.id} className="flex items-start gap-2">
-                            <span className={cn(
-                              'flex-shrink-0 w-5 h-5 rounded-full text-xs flex items-center justify-center mt-0.5',
-                              isActive 
-                                ? 'bg-foreground text-background' 
-                                : 'bg-muted text-muted-foreground'
-                            )}>
+                            <span
+                              className={cn(
+                                "flex-shrink-0 w-5 h-5 rounded-full text-xs flex items-center justify-center mt-0.5",
+                                isActive
+                                  ? "bg-foreground text-background"
+                                  : "bg-muted text-muted-foreground",
+                              )}
+                            >
                               {index + 1}
                             </span>
                             <button
                               onClick={() => handleTocClick(item.id)}
                               className={cn(
-                                'text-left text-sm py-0.5 transition-all duration-200',
+                                "text-left text-sm py-0.5 transition-all duration-200",
                                 isActive
-                                  ? 'text-foreground font-medium'
-                                  : 'text-muted-foreground hover:text-foreground'
+                                  ? "text-foreground font-medium"
+                                  : "text-muted-foreground hover:text-foreground",
                               )}
                             >
                               {item.title}
@@ -312,10 +343,10 @@ export function DocsLayout({ children, pageId = 'overview', title, description, 
 
       {/* Mobile TOC Dropdown */}
       {tocItems.length > 0 && (
-        <MobileToc 
-          items={tocItems} 
-          activeSection={activeSection} 
-          onSelect={handleTocClick} 
+        <MobileToc
+          items={tocItems}
+          activeSection={activeSection}
+          onSelect={handleTocClick}
         />
       )}
     </div>
@@ -323,13 +354,13 @@ export function DocsLayout({ children, pageId = 'overview', title, description, 
 }
 
 // Mobile TOC Component
-function MobileToc({ 
-  items, 
-  activeSection, 
-  onSelect 
-}: { 
-  items: TocItem[]; 
-  activeSection: string; 
+function MobileToc({
+  items,
+  activeSection,
+  onSelect,
+}: {
+  items: TocItem[];
+  activeSection: string;
   onSelect: (id: string) => void;
 }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -342,12 +373,14 @@ function MobileToc({
           className="flex items-center gap-2 px-4 py-2 bg-card border border-border rounded-full shadow-lg text-sm font-medium text-foreground"
         >
           <span>On this page</span>
-          <ChevronDown className={cn(
-            'w-4 h-4 transition-transform duration-200',
-            isOpen && 'rotate-180'
-          )} />
+          <ChevronDown
+            className={cn(
+              "w-4 h-4 transition-transform duration-200",
+              isOpen && "rotate-180",
+            )}
+          />
         </button>
-        
+
         {isOpen && (
           <div className="absolute bottom-full right-0 mb-2 w-64 bg-card border border-border rounded-lg shadow-xl overflow-hidden">
             <div className="p-2 border-b border-border">
@@ -359,7 +392,7 @@ function MobileToc({
               <ul className="space-y-1">
                 {items.map((item, index) => {
                   const isActive = activeSection === item.id;
-                  
+
                   return (
                     <li key={item.id}>
                       <button
@@ -368,18 +401,20 @@ function MobileToc({
                           setIsOpen(false);
                         }}
                         className={cn(
-                          'w-full flex items-center gap-2 text-left text-sm py-2 px-3 rounded-lg transition-all duration-200',
+                          "w-full flex items-center gap-2 text-left text-sm py-2 px-3 rounded-lg transition-all duration-200",
                           isActive
-                            ? 'bg-sidebar-accent text-foreground'
-                            : 'text-muted-foreground hover:text-foreground hover:bg-sidebar-accent/50'
+                            ? "bg-sidebar-accent text-foreground"
+                            : "text-muted-foreground hover:text-foreground hover:bg-sidebar-accent/50",
                         )}
                       >
-                        <span className={cn(
-                          'flex-shrink-0 w-5 h-5 rounded-full text-xs flex items-center justify-center',
-                          isActive 
-                            ? 'bg-foreground text-background' 
-                            : 'bg-muted text-muted-foreground'
-                        )}>
+                        <span
+                          className={cn(
+                            "flex-shrink-0 w-5 h-5 rounded-full text-xs flex items-center justify-center",
+                            isActive
+                              ? "bg-foreground text-background"
+                              : "bg-muted text-muted-foreground",
+                          )}
+                        >
                           {index + 1}
                         </span>
                         {item.title}

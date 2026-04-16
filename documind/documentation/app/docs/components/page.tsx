@@ -1,7 +1,6 @@
 import { DocsLayout } from '@/components/docs/docs-layout';
 import { components } from '@/lib/docs-data';
 import { FileCode, Layers, Database, Activity, Terminal, Server } from 'lucide-react';
-import Link from 'next/link';
 
 const componentIcons: Record<string, React.ReactNode> = {
   'DocuMind API': <FileCode className="w-5 h-5" />,
@@ -26,21 +25,14 @@ export default function ComponentsPage() {
     <DocsLayout
       pageId="components"
       title="Components"
-      description="DocuMind is composed of several modular components that work together to provide intelligent document retrieval."
-      breadcrumbs={[
-        { label: 'Docs', href: '/docs' },
-        { label: 'Components' }
-      ]}
+      description="The moving parts behind DocuMind, explained like you are reading the architecture with coffee in one hand and logs in the other."
+      breadcrumbs={[{ label: 'Docs', href: '/docs' }, { label: 'Components' }]}
     >
       <div className="space-y-8">
-        {components.map((component, index) => (
-          <section 
-            key={component.name} 
-            id={componentIds[component.name]}
-            className="p-6 rounded-xl bg-card border border-border"
-          >
+        {components.map((component) => (
+          <section key={component.name} id={componentIds[component.name]} className="p-6 rounded-xl bg-card border border-border">
             <div className="flex items-start gap-4">
-              <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-poof-accent/10 flex items-center justify-center text-poof-accent">
+              <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
                 {componentIcons[component.name]}
               </div>
               <div className="flex-1 min-w-0">
@@ -50,104 +42,87 @@ export default function ComponentsPage() {
                     {component.fileRef}
                   </code>
                 </div>
-                <p className="text-muted-foreground leading-relaxed mb-4">
-                  {component.description}
-                </p>
-                
-                {/* Additional details per component */}
+
+                <p className="text-muted-foreground leading-relaxed mb-4">{component.description}</p>
+
                 {component.name === 'DocuMind API' && (
                   <div className="space-y-3">
-                    <h4 className="text-sm font-medium text-foreground">Key Endpoints:</h4>
-                    <div className="grid gap-2">
-                      <div className="flex items-center gap-2 text-sm">
-                        <span className="px-2 py-0.5 rounded bg-poof-mint/10 text-poof-mint font-mono text-xs">POST</span>
-                        <code className="text-muted-foreground font-mono">/ingest</code>
-                        <span className="text-muted-foreground">- Upload documents</span>
+                    <h4 className="text-sm font-medium text-foreground">Primary endpoint groups</h4>
+                    <div className="grid gap-2 text-sm">
+                      <div className="flex items-center gap-2">
+                        <span className="px-2 py-0.5 rounded bg-poof-mint/10 text-poof-mint font-mono text-xs">System</span>
+                        <code className="text-muted-foreground font-mono">/health, /collections</code>
                       </div>
-                      <div className="flex items-center gap-2 text-sm">
-                        <span className="px-2 py-0.5 rounded bg-poof-accent/10 text-poof-accent font-mono text-xs">POST</span>
-                        <code className="text-muted-foreground font-mono">/search</code>
-                        <span className="text-muted-foreground">- Search documents</span>
+                      <div className="flex items-center gap-2">
+                        <span className="px-2 py-0.5 rounded bg-primary/10 text-primary font-mono text-xs">Control Plane</span>
+                        <code className="text-muted-foreground font-mono">/instances, /knowledge-bases, /resources</code>
                       </div>
-                      <div className="flex items-center gap-2 text-sm">
-                        <span className="px-2 py-0.5 rounded bg-poof-violet/10 text-poof-violet font-mono text-xs">POST</span>
-                        <code className="text-muted-foreground font-mono">/ask</code>
-                        <span className="text-muted-foreground">- Q&A with sources</span>
+                      <div className="flex items-center gap-2">
+                        <span className="px-2 py-0.5 rounded bg-poof-violet/10 text-poof-violet font-mono text-xs">Retrieval</span>
+                        <code className="text-muted-foreground font-mono">/search, /query, /search/advanced, /query/advanced</code>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="px-2 py-0.5 rounded bg-poof-peach/10 text-poof-peach font-mono text-xs">Quality</span>
+                        <code className="text-muted-foreground font-mono">/observability/scores, /observability/alerts</code>
                       </div>
                     </div>
                   </div>
                 )}
-                
+
                 {component.name === 'Runtime Container' && (
                   <div className="space-y-3">
-                    <h4 className="text-sm font-medium text-foreground">Includes:</h4>
+                    <h4 className="text-sm font-medium text-foreground">Wired services</h4>
                     <div className="flex flex-wrap gap-2">
-                      <span className="px-2 py-1 text-xs rounded bg-secondary text-muted-foreground">Python 3.11</span>
-                      <span className="px-2 py-1 text-xs rounded bg-secondary text-muted-foreground">FastAPI</span>
-                      <span className="px-2 py-1 text-xs rounded bg-secondary text-muted-foreground">Uvicorn</span>
-                      <span className="px-2 py-1 text-xs rounded bg-secondary text-muted-foreground">Embedding Models</span>
+                      {['vectordb', 'store', 'routing', 'ingestion', 'retrieval', 'agent', 'observability'].map((svc) => (
+                        <span key={svc} className="px-2 py-1 text-xs rounded bg-secondary text-muted-foreground font-mono">
+                          {svc}
+                        </span>
+                      ))}
                     </div>
                   </div>
                 )}
-                
+
                 {component.name === 'Retrieval Layer' && (
                   <div className="space-y-3">
-                    <h4 className="text-sm font-medium text-foreground">Search Methods:</h4>
+                    <h4 className="text-sm font-medium text-foreground">Retrieval modes</h4>
                     <div className="flex flex-wrap gap-2">
-                      <span className="px-2 py-1 text-xs rounded bg-poof-accent/10 text-poof-accent">Vector Similarity</span>
-                      <span className="px-2 py-1 text-xs rounded bg-poof-violet/10 text-poof-violet">BM25 Keyword</span>
-                      <span className="px-2 py-1 text-xs rounded bg-poof-mint/10 text-poof-mint">Hybrid RRF</span>
+                      <span className="px-2 py-1 text-xs rounded bg-primary/10 text-primary">Semantic</span>
+                      <span className="px-2 py-1 text-xs rounded bg-poof-violet/10 text-poof-violet">Hybrid + RRF</span>
+                      <span className="px-2 py-1 text-xs rounded bg-poof-mint/10 text-poof-mint">Hybrid + DBSF</span>
+                    </div>
+                    <p className="text-xs text-muted-foreground leading-relaxed">
+                      It also supports filters (`eq`, `any_of`, `between`, `gt/gte/lt/lte`, `text`) so you can scope retrieval without writing weird post-filter logic.
+                    </p>
+                  </div>
+                )}
+
+                {component.name === 'Observability Layer' && (
+                  <div className="space-y-3">
+                    <h4 className="text-sm font-medium text-foreground">Scores we track</h4>
+                    <div className="grid gap-2 text-sm text-muted-foreground">
+                      <p>Retrieval quality score (did we fetch the right chunks?)</p>
+                      <p>Chunk relevance score (did those chunks actually answer the question?)</p>
+                      <p>Hallucination rate (did answer claims stay grounded?)</p>
                     </div>
                   </div>
                 )}
-                
-                {component.name === 'Observability Layer' && (
-                  <div className="space-y-3">
-                    <h4 className="text-sm font-medium text-foreground">Features:</h4>
-                    <div className="flex flex-wrap gap-2">
-                      <span className="px-2 py-1 text-xs rounded bg-secondary text-muted-foreground">Structured Logging</span>
-                      <span className="px-2 py-1 text-xs rounded bg-secondary text-muted-foreground">Request Tracing</span>
-                      <span className="px-2 py-1 text-xs rounded bg-secondary text-muted-foreground">Metrics Export</span>
-                    </div>
-                  </div>
+
+                {component.name === 'DCLI Interface' && (
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    DCLI is intentionally context-aware. You can set active context once and stop copy-pasting IDs into every command like it is 2016.
+                  </p>
+                )}
+
+                {component.name === 'MCP Server' && (
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    MCP exposes the same power to AI clients, with guardrails for risky actions. The assistant gets tools, not unchecked admin access — on purpose.
+                  </p>
                 )}
               </div>
             </div>
           </section>
         ))}
       </div>
-
-      {/* Next Steps */}
-      <section className="mt-12 pt-8 border-t border-border">
-        <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4">
-          Related Documentation
-        </h3>
-        <div className="grid gap-3 sm:grid-cols-2">
-          <Link 
-            href="/docs/dcli"
-            className="flex items-center gap-3 p-4 rounded-lg bg-card border border-border hover:border-poof-accent/50 transition-colors group"
-          >
-            <div>
-              <span className="font-medium text-foreground group-hover:text-poof-accent transition-colors">
-                DCLI Reference
-              </span>
-              <p className="text-xs text-muted-foreground">Full command documentation</p>
-            </div>
-          </Link>
-          
-          <Link 
-            href="/docs/mcp-server"
-            className="flex items-center gap-3 p-4 rounded-lg bg-card border border-border hover:border-poof-accent/50 transition-colors group"
-          >
-            <div>
-              <span className="font-medium text-foreground group-hover:text-poof-accent transition-colors">
-                MCP Server
-              </span>
-              <p className="text-xs text-muted-foreground">AI assistant integration</p>
-            </div>
-          </Link>
-        </div>
-      </section>
     </DocsLayout>
   );
 }

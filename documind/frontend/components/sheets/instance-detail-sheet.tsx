@@ -1,6 +1,5 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { Database, Copy } from "lucide-react";
 import { toast } from "sonner";
@@ -12,8 +11,8 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useKnowledgeBases } from "@/hooks/queries";
 import { useAppContext } from "@/lib/context";
-import api from "@/lib/api";
 import { formatDateTime } from "@/lib/format";
 import type { Instance } from "@/lib/types";
 
@@ -28,11 +27,9 @@ export function InstanceDetailSheet({
 }: InstanceDetailSheetProps) {
   const { activeInstanceId, setActiveInstance } = useAppContext();
 
-  const { data: knowledgeBases, isLoading: loadingKbs } = useQuery({
-    queryKey: ["knowledge-bases", instance?.id],
-    queryFn: () => api.getKnowledgeBases(instance?.id),
-    enabled: !!instance,
-  });
+  const { data: knowledgeBases, isLoading: loadingKbs } = useKnowledgeBases(
+    instance?.id
+  );
 
   const namespaces = knowledgeBases
     ? [...new Set(knowledgeBases.map((kb) => kb.namespace_id))]

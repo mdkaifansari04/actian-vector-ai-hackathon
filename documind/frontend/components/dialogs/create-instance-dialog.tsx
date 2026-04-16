@@ -2,8 +2,6 @@
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -22,15 +20,8 @@ import {
   FieldLabel,
   FieldError,
 } from "@/components/ui/field";
-import api from "@/lib/api";
-import type { ApiError } from "@/lib/types";
-
-const createInstanceSchema = z.object({
-  name: z.string().min(1, "Name is required").max(100, "Name is too long"),
-  description: z.string().max(500, "Description is too long").optional(),
-});
-
-type CreateInstanceForm = z.infer<typeof createInstanceSchema>;
+import { createInstanceSchema, type CreateInstanceBody } from "@/utils/validations";
+import { useCreateInstance } from "@/hooks/mutations";
 
 interface CreateInstanceDialogProps {
   open: boolean;
@@ -41,9 +32,9 @@ export function CreateInstanceDialog({
   open,
   onOpenChange,
 }: CreateInstanceDialogProps) {
-  const queryClient = useQueryClient();
+  const createMutation = useCreateInstance();
 
-  const form = useForm<CreateInstanceForm>({
+  const form = useForm<CreateInstanceBody>({
     resolver: zodResolver(createInstanceSchema),
     defaultValues: {
       name: "",
@@ -51,25 +42,21 @@ export function CreateInstanceDialog({
     },
   });
 
-  const createMutation = useMutation({
-    mutationFn: api.createInstance.bind(api),
-    onSuccess: (data: { name: string }) => {
-      queryClient.invalidateQueries({ queryKey: ["instances"] });
-      toast.success("Instance created", {
-        description: `"${data.name}" has been created successfully.`,
-      });
-      onOpenChange(false);
-      form.reset();
-    },
-    onError: (error: ApiError) => {
-      toast.error("Failed to create instance", {
-        description: error.message || "An unexpected error occurred.",
-      });
-    },
-  });
-
-  const onSubmit = (data: CreateInstanceForm) => {
-    createMutation.mutate(data);
+  const onSubmit = (data: CreateInstanceBody) => {
+    createMutation.mutate(data, {
+      onSuccess: (instance) => {
+        toast.success("Instance created", {
+          description: `"${instance.name}" has been created successfully.`,
+        });
+        onOpenChange(false);
+        form.reset();
+      },
+      onError: (error: Error) => {
+        toast.error("Failed to create instance", {
+          description: error.message || "An unexpected error occurred.",
+        });
+      },
+    });
   };
 
   return (

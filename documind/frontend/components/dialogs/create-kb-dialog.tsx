@@ -2,8 +2,6 @@
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -28,21 +26,13 @@ import {
   FieldLabel,
   FieldError,
 } from "@/components/ui/field";
-import api from "@/lib/api";
+import { useInstances } from "@/hooks/queries";
+import { useCreateKnowledgeBase } from "@/hooks/mutations";
+import {
+  createKnowledgeBaseSchema,
+  type CreateKnowledgeBaseBody,
+} from "@/utils/validations";
 import { useAppContext } from "@/lib/context";
-import type { ApiError } from "@/lib/types";
-
-const createKbSchema = z.object({
-  instance_id: z.string().min(1, "Instance is required"),
-  namespace_id: z.string().min(1, "Namespace is required"),
-  name: z.string().min(1, "Name is required").max(100, "Name is too long"),
-  embedding_profile: z.string().optional(),
-  embedding_model: z.string().optional(),
-  llm_profile: z.string().optional(),
-  distance_metric: z.enum(["cosine", "euclidean", "dot"]).optional(),
-});
-
-type CreateKbForm = z.infer<typeof createKbSchema>;
 
 interface CreateKnowledgeBaseDialogProps {
   open: boolean;
@@ -53,16 +43,13 @@ export function CreateKnowledgeBaseDialog({
   open,
   onOpenChange,
 }: CreateKnowledgeBaseDialogProps) {
-  const queryClient = useQueryClient();
   const { activeInstanceId } = useAppContext();
+  const createMutation = useCreateKnowledgeBase();
 
-  const { data: instances } = useQuery({
-    queryKey: ["instances"],
-    queryFn: () => api.getInstances(),
-  });
+  const { data: instances } = useInstances();
 
-  const form = useForm<CreateKbForm>({
-    resolver: zodResolver(createKbSchema),
+  const form = useForm<CreateKnowledgeBaseBody>({
+    resolver: zodResolver(createKnowledgeBaseSchema),
     defaultValues: {
       instance_id: activeInstanceId || "",
       namespace_id: "",
@@ -72,25 +59,21 @@ export function CreateKnowledgeBaseDialog({
     },
   });
 
-  const createMutation = useMutation({
-    mutationFn: api.createKnowledgeBase.bind(api),
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["knowledge-bases"] });
-      toast.success("Knowledge Base created", {
-        description: `"${data.name}" has been created successfully.`,
-      });
-      onOpenChange(false);
-      form.reset();
-    },
-    onError: (error: ApiError) => {
-      toast.error("Failed to create Knowledge Base", {
-        description: error.message || "An unexpected error occurred.",
-      });
-    },
-  });
-
-  const onSubmit = (data: CreateKbForm) => {
-    createMutation.mutate(data);
+  const onSubmit = (data: CreateKnowledgeBaseBody) => {
+    createMutation.mutate(data, {
+      onSuccess: (kb) => {
+        toast.success("Knowledge Base created", {
+          description: `"${kb.name}" has been created successfully.`,
+        });
+        onOpenChange(false);
+        form.reset();
+      },
+      onError: (error: Error) => {
+        toast.error("Failed to create Knowledge Base", {
+          description: error.message || "An unexpected error occurred.",
+        });
+      },
+    });
   };
 
   const triggerClassName =

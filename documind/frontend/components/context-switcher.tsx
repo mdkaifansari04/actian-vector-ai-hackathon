@@ -1,13 +1,12 @@
 'use client'
 
 import { useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
 import { Check, ChevronRight, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { cn } from '@/lib/utils'
 import { useAppContext } from '@/lib/context'
-import api from '@/lib/api'
+import { useInstances, useKnowledgeBases } from '@/hooks/queries'
 
 interface ContextSwitcherProps {
   onClose: () => void
@@ -34,16 +33,11 @@ export function ContextSwitcher({ onClose }: ContextSwitcherProps) {
       : null
   )
 
-  const { data: instances, isLoading: loadingInstances } = useQuery({
-    queryKey: ['instances'],
-    queryFn: () => api.getInstances(),
-  })
+  const { data: instances, isLoading: loadingInstances } = useInstances()
 
-  const { data: knowledgeBases, isLoading: loadingKbs } = useQuery({
-    queryKey: ['knowledge-bases', selectedInstance?.id],
-    queryFn: () => api.getKnowledgeBases(selectedInstance?.id),
-    enabled: !!selectedInstance?.id,
-  })
+  const { data: knowledgeBases, isLoading: loadingKbs } = useKnowledgeBases(
+    selectedInstance?.id
+  )
 
   // Get unique namespaces from knowledge bases
   const namespaces = knowledgeBases

@@ -1,20 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import {
-  Search,
-  Check,
-  ExternalLink,
-  MoreHorizontal,
-  Server,
-} from "lucide-react";
+import { Search, Check, ExternalLink, Server } from "lucide-react";
 import Link from "next/link";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CreateInstanceDialog } from "@/components/dialogs/create-instance-dialog";
 import { InstanceDetailSheet } from "@/components/sheets/instance-detail-sheet";
+import { useInstances } from "@/hooks/queries";
 import { useAppContext } from "@/lib/context";
-import api from "@/lib/api";
 import { formatDistanceToNow } from "@/lib/format";
 import type { Instance } from "@/lib/types";
 
@@ -39,22 +32,26 @@ function getGradient(name: string) {
 export default function InstancesPage() {
   const [createOpen, setCreateOpen] = useState(false);
   const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState<"all" | "active">("all");
   const [selectedInstance, setSelectedInstance] = useState<Instance | null>(
     null,
   );
 
   const { activeInstanceId, setActiveInstance } = useAppContext();
 
-  const { data: instances, isLoading } = useQuery({
-    queryKey: ["instances"],
-    queryFn: () => api.getInstances(),
-  });
+  const { data: instances, isLoading } = useInstances();
 
-  const filteredInstances = instances?.filter(
-    (instance) =>
+  const filteredInstances = instances?.filter((instance) => {
+    const matchesSearch =
       instance.name.toLowerCase().includes(search.toLowerCase()) ||
-      instance.description?.toLowerCase().includes(search.toLowerCase()),
-  );
+      instance.description?.toLowerCase().includes(search.toLowerCase());
+
+    const matchesFilter =
+      filter === "all" ||
+      (filter === "active" && instance.id === activeInstanceId);
+
+    return matchesSearch && matchesFilter;
+  });
 
   return (
     <div className="mx-auto max-w-5xl px-6 py-6">
@@ -88,10 +85,24 @@ export default function InstancesPage() {
 
         {/* Segmented status pills */}
         <div className="flex items-center gap-0.5 rounded-md border border-white/6 bg-white/2 p-0.5">
-          <button className="rounded-[5px] bg-white/8 px-2.5 py-1 text-[11px] font-medium text-white transition-colors">
+          <button
+            onClick={() => setFilter("all")}
+            className={`rounded-[5px] px-2.5 py-1 text-[11px] font-medium transition-colors ${
+              filter === "all"
+                ? "bg-white/8 text-white"
+                : "text-muted-foreground/50 hover:text-muted-foreground"
+            }`}
+          >
             All
           </button>
-          <button className="rounded-[5px] px-2.5 py-1 text-[11px] font-medium text-muted-foreground/50 transition-colors hover:text-muted-foreground">
+          <button
+            onClick={() => setFilter("active")}
+            className={`rounded-[5px] px-2.5 py-1 text-[11px] font-medium transition-colors ${
+              filter === "active"
+                ? "bg-white/8 text-white"
+                : "text-muted-foreground/50 hover:text-muted-foreground"
+            }`}
+          >
             Active
           </button>
         </div>

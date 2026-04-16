@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
 import { useSearchParams } from "next/navigation";
 import { Check, Database, Search } from "lucide-react";
 import {
@@ -14,8 +13,8 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { CreateKnowledgeBaseDialog } from "@/components/dialogs/create-kb-dialog";
 import { KnowledgeBaseDetailSheet } from "@/components/sheets/kb-detail-sheet";
+import { useInstances, useKnowledgeBases } from "@/hooks/queries";
 import { useAppContext } from "@/lib/context";
-import api from "@/lib/api";
 import { formatDistanceToNow } from "@/lib/format";
 import type { KnowledgeBase } from "@/lib/types";
 
@@ -70,15 +69,9 @@ export default function KnowledgeBasesPage() {
   const { activeInstanceId, activeNamespaceId, activeKbId, setActiveKb } =
     useAppContext();
 
-  const { data: instances } = useQuery({
-    queryKey: ["instances"],
-    queryFn: () => api.getInstances(),
-  });
+  const { data: instances } = useInstances();
 
-  const { data: knowledgeBases, isLoading } = useQuery({
-    queryKey: ["knowledge-bases"],
-    queryFn: () => api.getKnowledgeBases(),
-  });
+  const { data: knowledgeBases, isLoading } = useKnowledgeBases();
 
   useEffect(() => {
     setInstanceFilter(queryInstanceFilter);

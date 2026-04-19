@@ -43,6 +43,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Slider } from '@/components/ui/slider'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Skeleton } from '@/components/ui/skeleton'
+import { CardStackSkeleton } from '@/components/skeletons/layout-skeletons'
 import { FieldGroup, Field, FieldLabel, FieldError } from '@/components/ui/field'
 import { PageHeader } from '@/components/page-header'
 import {
@@ -734,11 +735,7 @@ export default function AskPage() {
           </CardHeader>
           <CardContent>
             {isAsking ? (
-              <div className="space-y-3">
-                {Array.from({ length: 3 }).map((_, i) => (
-                  <Skeleton key={i} className="h-24 w-full rounded-lg bg-white/3" />
-                ))}
-              </div>
+              <CardStackSkeleton items={3} />
             ) : response?.sources && response.sources.length > 0 ? (
               <ScrollArea className="h-[500px] pr-4">
                 <div className="space-y-3 pr-1">

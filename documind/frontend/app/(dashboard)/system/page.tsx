@@ -19,6 +19,7 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
+import { CardStackSkeleton } from '@/components/skeletons/layout-skeletons'
 import { PageHeader } from '@/components/page-header'
 import { useCollections, useHealth } from '@/hooks/queries'
 import { formatDateTime } from '@/lib/format'
@@ -180,11 +181,11 @@ export default function SystemPage() {
           </CardHeader>
           <CardContent>
             {loadingCollections ? (
-              <div className="space-y-2">
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <Skeleton key={i} className="h-8 w-full rounded-lg bg-white/3" />
-                ))}
-              </div>
+              <CardStackSkeleton
+                items={5}
+                itemClassName="h-8 w-full rounded-lg bg-white/3"
+                containerClassName="space-y-2"
+              />
             ) : collections?.collections && collections.collections.length > 0 ? (
               <div className="max-h-[300px] space-y-1 overflow-y-auto pr-2">
                 {collections.collections.map((collection, index) => (
@@ -236,11 +237,11 @@ export default function SystemPage() {
         </CardHeader>
         <CardContent>
           {loadingCollections ? (
-            <div className="space-y-2">
-              {Array.from({ length: 3 }).map((_, i) => (
-                <Skeleton key={i} className="h-12 w-full rounded-lg bg-white/3" />
-              ))}
-            </div>
+            <CardStackSkeleton
+              items={3}
+              itemClassName="h-12 w-full rounded-lg bg-white/3"
+              containerClassName="space-y-2"
+            />
           ) : collections?.knowledge_bases &&
             collections.knowledge_bases.length > 0 ? (
             <div className="overflow-hidden rounded-xl border border-white/6 bg-black">

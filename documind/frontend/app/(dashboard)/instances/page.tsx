@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Search, Check, ExternalLink, Server } from "lucide-react";
 import Link from "next/link";
-import { Skeleton } from "@/components/ui/skeleton";
+import { TableRowsSkeleton } from "@/components/skeletons/layout-skeletons";
 import { CreateInstanceDialog } from "@/components/dialogs/create-instance-dialog";
 import { InstanceDetailSheet } from "@/components/sheets/instance-detail-sheet";
 import { useInstances } from "@/hooks/queries";
@@ -122,18 +122,17 @@ export default function InstancesPage() {
         {/* Rows */}
         <div className="flex flex-col gap-px px-1 pb-1.5">
           {isLoading ? (
-            Array.from({ length: 3 }).map((_, i) => (
-              <div
-                key={i}
-                className={`grid grid-cols-[1fr_1.5fr_0.7fr_0.7fr_100px] items-center gap-2 bg-[#141414] px-4 py-3 ${i === 0 ? "rounded-t-lg" : ""} ${i === 2 ? "rounded-b-lg" : ""}`}
-              >
-                <Skeleton className="h-4 w-28 rounded-md bg-white/3" />
-                <Skeleton className="h-4 w-40 rounded-md bg-white/3" />
-                <Skeleton className="h-4 w-16 rounded-md bg-white/3" />
-                <Skeleton className="h-4 w-16 rounded-md bg-white/3" />
-                <Skeleton className="ml-auto h-6 w-16 rounded-md bg-white/3" />
-              </div>
-            ))
+            <TableRowsSkeleton
+              rows={3}
+              gridClassName="grid grid-cols-[1fr_1.5fr_0.7fr_0.7fr_100px]"
+              cellClassNames={[
+                "w-28",
+                "w-40",
+                "w-16",
+                "w-16",
+                "ml-auto h-6 w-16",
+              ]}
+            />
           ) : filteredInstances && filteredInstances.length > 0 ? (
             filteredInstances.map((instance, index) => (
               <div

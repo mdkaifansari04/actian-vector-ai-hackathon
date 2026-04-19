@@ -10,7 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Skeleton } from "@/components/ui/skeleton";
+import { TableRowsSkeleton } from "@/components/skeletons/layout-skeletons";
 import { CreateKnowledgeBaseDialog } from "@/components/dialogs/create-kb-dialog";
 import { KnowledgeBaseDetailSheet } from "@/components/sheets/kb-detail-sheet";
 import { useInstances, useKnowledgeBases } from "@/hooks/queries";
@@ -237,21 +237,18 @@ export default function KnowledgeBasesPage() {
 
         <div className="flex flex-col gap-px px-1 pb-1.5">
           {isLoading ? (
-            Array.from({ length: 4 }).map((_, i) => (
-              <div
-                key={i}
-                className={`grid grid-cols-[1.1fr_0.85fr_0.95fr_0.85fr_0.65fr_110px] items-center gap-2 bg-[#141414] px-4 py-3 ${
-                  i === 0 ? "rounded-t-lg" : ""
-                } ${i === 3 ? "rounded-b-lg" : ""}`}
-              >
-                <Skeleton className="h-4 w-40 rounded-md bg-white/3" />
-                <Skeleton className="h-4 w-28 rounded-md bg-white/3" />
-                <Skeleton className="h-4 w-32 rounded-md bg-white/3" />
-                <Skeleton className="h-4 w-28 rounded-md bg-white/3" />
-                <Skeleton className="h-4 w-16 rounded-md bg-white/3" />
-                <Skeleton className="ml-auto h-6 w-16 rounded-md bg-white/3" />
-              </div>
-            ))
+            <TableRowsSkeleton
+              rows={4}
+              gridClassName="grid grid-cols-[1.1fr_0.85fr_0.95fr_0.85fr_0.65fr_110px]"
+              cellClassNames={[
+                "w-40",
+                "w-28",
+                "w-32",
+                "w-28",
+                "w-16",
+                "ml-auto h-6 w-16",
+              ]}
+            />
           ) : filteredKbs.length > 0 ? (
             filteredKbs.map((kb, index) => {
               const isActiveKb = activeKbId === kb.id;

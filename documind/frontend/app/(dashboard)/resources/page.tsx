@@ -29,7 +29,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Skeleton } from "@/components/ui/skeleton";
+import { TableRowsSkeleton } from "@/components/skeletons/layout-skeletons";
 import {
   Field,
   FieldError,
@@ -892,18 +892,11 @@ export default function ResourcesPage() {
 
             <div className="flex flex-col gap-px px-1 pb-1.5">
               {loadingResources ? (
-                Array.from({ length: 5 }).map((_, i) => (
-                  <div
-                    key={i}
-                    className={`grid grid-cols-[1.5fr_0.6fr_0.5fr_0.6fr_0.8fr] items-center gap-2 bg-[#141414] px-4 py-3 ${i === 0 ? "rounded-t-lg" : ""} ${i === 4 ? "rounded-b-lg" : ""}`}
-                  >
-                    <Skeleton className="h-4 w-32 rounded-md bg-white/3" />
-                    <Skeleton className="h-4 w-14 rounded-md bg-white/3" />
-                    <Skeleton className="h-4 w-8 rounded-md bg-white/3" />
-                    <Skeleton className="h-4 w-16 rounded-md bg-white/3" />
-                    <Skeleton className="h-4 w-20 rounded-md bg-white/3" />
-                  </div>
-                ))
+                <TableRowsSkeleton
+                  rows={5}
+                  gridClassName="grid grid-cols-[1.5fr_0.6fr_0.5fr_0.6fr_0.8fr]"
+                  cellClassNames={["w-32", "w-14", "w-8", "w-16", "w-20"]}
+                />
               ) : resources && resources.length > 0 ? (
                 paginatedResources.map((resource, index) => {
                   const style =

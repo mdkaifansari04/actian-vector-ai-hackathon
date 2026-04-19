@@ -11,7 +11,6 @@ import {
   MessageCircleQuestion,
   MessagesSquare,
   HardDrive,
-  Brain,
 } from "lucide-react";
 import {
   Sidebar,

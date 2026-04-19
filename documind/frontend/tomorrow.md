@@ -4,7 +4,7 @@ This file summarizes what changed and how to test everything locally before cont
 
 ## What Was Changed
 
-## 1) Data-Access Layer Introduced (Axios + typed contracts)
+### 1) Data-Access Layer Introduced (Axios + typed contracts)
 
 Added:
 - `data-access/data-types.ts`
@@ -23,7 +23,7 @@ What it does:
 - Uses shared `ApiResponse<T>` + typed entities/contracts.
 - Keeps mock fallback behavior when `NEXT_PUBLIC_API_URL` is not set.
 
-## 2) Validation Standardized (Zod source)
+### 2) Validation Standardized (Zod source)
 
 Added:
 - `utils/validations.ts`
@@ -36,7 +36,7 @@ What it does:
   - search payload
   - ask payload
 
-## 3) Query/Mutation Hooks Layer Added
+### 3) Query/Mutation Hooks Layer Added
 
 Added:
 - `hooks/queries.ts`
@@ -48,7 +48,7 @@ What it does:
 - Write operations via mutation hooks.
 - Cache invalidation moved to mutation layer.
 
-## 4) Query Wrapper Component Added
+### 4) Query Wrapper Component Added
 
 Added:
 - `components/query-wrapper.tsx`
@@ -57,7 +57,7 @@ Status:
 - Created and ready.
 - Not fully adopted on all pages yet.
 
-## 5) Dashboard Pages Migrated Off Direct API Calls
+### 5) Dashboard Pages Migrated Off Direct API Calls
 
 Updated:
 - `app/(dashboard)/page.tsx`
@@ -75,7 +75,7 @@ Also updated supporting components:
 - `components/dialogs/create-kb-dialog.tsx`
 - `components/sheets/instance-detail-sheet.tsx`
 
-## 6) Compatibility Layer Kept
+### 6) Compatibility Layer Kept
 
 Updated:
 - `lib/api.ts`
@@ -84,7 +84,7 @@ Updated:
 What it does:
 - Preserves old import surface while routing to new data-access modules.
 
-## 7) Tracker Updated
+### 7) Tracker Updated
 
 Updated:
 - `integration-todo.md`
@@ -92,7 +92,8 @@ Updated:
 Status now:
 - Phase 1 complete
 - Phase 2 mostly complete
-- Phases 3-4 pending
+- Phase 3 deferred by decision (Next.js App Router retained)
+- Phase 4 in progress (skeleton/error hardening shipped; manual create/update toast flow checks pending)
 
 ---
 
@@ -189,7 +190,30 @@ Note:
 
 ## Immediate Next Work
 
-1. Complete remaining Phase 2 item:
-   - adopt `QueryWrapper` consistently across dashboard pages.
-2. Start Phase 3:
-   - TanStack Router host setup + Wave A route cutover.
+1. Continue Phase 4 hardening with low risk:
+   - verify create/update flows and toasts in a live browser session (with backend running)
+2. Optional consistency pass:
+   - adopt `QueryWrapper` where loading/error branches are still duplicated.
+3. Keep commit scope safe:
+   - docs-only and non-breaking updates for hackathon packaging.
+
+## Tomorrow Delivery Plan (Hackathon)
+
+Primary tracker file:
+- `hackathon-submission-checklist.md`
+
+1. Product videos (one per core area)
+   - record short walkthrough clips for: Overview, Instances, Knowledge Bases, Resources, Search, Ask, Chat, System.
+   - keep each clip focused on one story and include outcome/state at end.
+
+2. Docs update and packaging
+   - update frontend README/runbook with latest Phase 4 status and known limitations (`eslint` missing, manual flow checks pending).
+   - add a concise demo script/checklist for judges.
+
+3. Deployment
+   - deploy latest frontend build to target environment.
+   - validate production URLs for all 8 routes after deploy.
+
+4. Hackathon submission
+   - finalize submission form assets: deployed URL, demo video links, architecture summary, and setup notes.
+   - run a final pre-submit checklist pass before submission.

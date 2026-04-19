@@ -7,9 +7,9 @@
 
 ## Progress
 
-- Overall: `25%` (1/4 phases done)
-- Current phase: `Phase 2`
-- Last updated: `2026-04-16`
+- Overall: `55%` (Phase 1 complete, Phase 2 mostly complete, Phase 4 in progress)
+- Current phase: `Phase 4`
+- Last updated: `2026-04-19`
 
 ---
 
@@ -47,6 +47,9 @@ Exit criteria:
 
 ## Phase 3: TanStack Router + Navigation Cutover (Incremental)
 
+Decision note:
+- Deferred intentionally on `2026-04-17` to keep Next.js App Router + `next/navigation` for low-risk delivery.
+
 - [ ] Mount TanStack Router inside Next.js host route.
 - [ ] Migrate routes incrementally:
   - [ ] Wave A: `/`, `/instances`, `/knowledge-bases`
@@ -66,15 +69,18 @@ Exit criteria:
 
 ## Phase 4: Skeleton UX + Hardening + Cleanup
 
-- [ ] Add reusable skeletons for table, two-panel, and chat layouts.
-- [ ] Ensure skeleton styles match `STYLE.md` tokens (`bg-white/3`, `border-white/6`, existing radii).
-- [ ] Add route error fallback and retry actions.
-- [ ] Remove dead legacy calls and duplicate code paths.
+- [x] Add reusable skeletons for table, two-panel, and chat layouts.
+- [x] Ensure skeleton styles match `STYLE.md` tokens (`bg-white/3`, `border-white/6`, existing radii).
+- [x] Add route error fallback and retry actions.
+- [x] Remove dead legacy calls and duplicate code paths.
 - [ ] Final verification:
-  - [ ] `npm run build`
-  - [ ] `npm run lint`
-  - [ ] smoke test all 8 routes
+  - [x] `bun run build`
+  - [ ] `bun run lint`
+    - skipped: `eslint` binary is not installed in this project setup.
+  - [x] smoke test all 8 routes
+    - verified on `2026-04-19` via `next start` + HTTP checks: `/`, `/instances`, `/knowledge-bases`, `/resources`, `/search`, `/ask`, `/chat`, `/system` all returned `200`.
   - [ ] verify create/update flows and toasts
+    - pending manual browser session with backend running (requires interactive UI actions).
 
 Exit criteria:
 - [ ] All routes stable, styled, and using standard layers.

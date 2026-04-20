@@ -114,10 +114,13 @@ def build_parser() -> argparse.ArgumentParser:
             "  init            -> bootstrap active context for current context-id\n"
             "  context-show    -> read saved context (instance_id + namespace_id)\n"
             "  context-set     -> set saved context manually (--instance-id --namespace-id)\n"
+            "  contexts        -> list all saved contexts on this machine\n"
+            "  context-delete  -> delete saved context for --context-id\n"
             "  instances       -> list instances\n"
             "  instance-create -> create instance (--name, -d/--description)\n"
             "  namespaces      -> list namespaces for an instance (--instance-id optional)\n"
             "  list-kbs        -> list knowledge bases (--instance-id optional)\n"
+            "  health          -> backend health probe (/health)\n"
             "  search-docs     -> fast retrieval (--qr/--query, --top-k)\n"
             "  ask-docs        -> grounded answer (-qs/--question, --top-k)\n"
             "  ingest-text     -> add inline/file text (--content or --content-file)\n"
@@ -126,7 +129,8 @@ def build_parser() -> argparse.ArgumentParser:
             "  documind init --namespace-id company_docs\n"
             "  documind search-docs --qr \"deploy command\" --top-k 5\n"
             "  documind ask-docs -qs \"How do I deploy?\" --top-k 5\n"
-            "  documind context-show --bot=true"
+            "  documind context-show --bot=true\n"
+            "  documind contexts"
         ),
     )
     parser.add_argument(
@@ -300,6 +304,31 @@ def build_parser() -> argparse.ArgumentParser:
     context_set_parser.add_argument("--instance-id", required=True, help="Instance id to persist in context.")
     context_set_parser.add_argument("--namespace-id", required=True, help="Namespace id to persist in context.")
     _add_bot_argument(context_set_parser)
+
+    contexts_parser = subparsers.add_parser(
+        "contexts",
+        formatter_class=_DocuMindHelpFormatter,
+        help="List saved local contexts.",
+        description="List all saved context rows from local context store.",
+    )
+    _add_bot_argument(contexts_parser)
+
+    context_delete_parser = subparsers.add_parser(
+        "context-delete",
+        formatter_class=_DocuMindHelpFormatter,
+        help="Delete saved context.",
+        description="Delete the saved context row for --context-id.",
+        epilog="Example:\n  documind --context-id work context-delete",
+    )
+    _add_bot_argument(context_delete_parser)
+
+    health_parser = subparsers.add_parser(
+        "health",
+        formatter_class=_DocuMindHelpFormatter,
+        help="Check backend health.",
+        description="Call backend /health and report status.",
+    )
+    _add_bot_argument(health_parser)
 
     init_parser = subparsers.add_parser(
         "init",
@@ -493,6 +522,15 @@ def execute_command(args: argparse.Namespace, service: DocuMindMCPService) -> di
             context_id=args.context_id,
         )
 
+    if args.command == "contexts":
+        return service.list_active_contexts()
+
+    if args.command == "context-delete":
+        return service.clear_active_context(context_id=args.context_id)
+
+    if args.command == "health":
+        return service.health_check()
+
     return _error_response(message=f"unsupported command: {args.command}", error="server_error")
 
 
@@ -583,6 +621,18 @@ def _render_human_response(args: argparse.Namespace, response: dict[str, Any]) -
             lines.append(block)
         return "\n".join(lines)
 
+    if args.command == "contexts" and isinstance(data, dict):
+        items = data.get("contexts") or []
+        rows = [
+            [item.get("context_id"), item.get("instance_id"), item.get("namespace_id"), item.get("updated_at")]
+            for item in items
+            if isinstance(item, dict)
+        ]
+        if rows:
+            lines.append(_styled("Saved Contexts", bold=True, color="96"))
+            lines.append(_render_table(["context_id", "instance_id", "namespace_id", "updated_at"], rows))
+        return "\n".join(lines)
+
     if args.command == "instances" and isinstance(data, dict):
         items = data.get("instances") or []
         rows = [
@@ -646,7 +696,21 @@ def _render_human_response(args: argparse.Namespace, response: dict[str, Any]) -
                 lines.append(f"  - {source_ref} (score: {score})")
         return "\n".join(lines)
 
-    if args.command in {"ingest-text", "context-set", "init", "instance-create"} and isinstance(data, dict):
+    if args.command == "health" and isinstance(data, dict):
+        block = _render_kv_block(
+            "Health",
+            {
+                "backend_status": data.get("backend_status"),
+                "api_url": data.get("api_url"),
+            },
+        )
+        if block:
+            lines.append(block)
+        return "\n".join(lines)
+
+    if args.command in {"ingest-text", "context-set", "context-delete", "init", "instance-create"} and isinstance(
+        data, dict
+    ):
         block = _render_kv_block("Details", data)
         if block:
             lines.append(block)

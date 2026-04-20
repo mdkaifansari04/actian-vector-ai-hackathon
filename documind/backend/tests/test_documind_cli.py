@@ -33,6 +33,24 @@ class FakeService:
             "meta": {},
             "text": "ok",
         }
+        self.list_contexts_response = {
+            "status": "success",
+            "data": {"contexts": []},
+            "meta": {"count": 0},
+            "text": "ok",
+        }
+        self.clear_context_response = {
+            "status": "success",
+            "data": {"context_id": "default", "deleted": True},
+            "meta": {"context_id": "default"},
+            "text": "ok",
+        }
+        self.health_response = {
+            "status": "success",
+            "data": {"backend_status": "ok", "api_url": "http://localhost:8000"},
+            "meta": {},
+            "text": "ok",
+        }
 
     def search_docs(self, **kwargs):
         self.calls.append(("search_docs", kwargs))
@@ -74,6 +92,18 @@ class FakeService:
     def set_active_context(self, **kwargs):
         self.calls.append(("set_active_context", kwargs))
         return self.set_context_response
+
+    def list_active_contexts(self, **kwargs):
+        self.calls.append(("list_active_contexts", kwargs))
+        return self.list_contexts_response
+
+    def clear_active_context(self, **kwargs):
+        self.calls.append(("clear_active_context", kwargs))
+        return self.clear_context_response
+
+    def health_check(self, **kwargs):
+        self.calls.append(("health_check", kwargs))
+        return self.health_response
 
 
 class DocuMindCLITests(unittest.TestCase):
@@ -291,6 +321,49 @@ class DocuMindCLITests(unittest.TestCase):
         rendered = json.loads(buffer.getvalue())
         self.assertEqual(rendered["status"], "success")
         self.assertEqual(rendered["data"]["context_id"], "default")
+
+    def test_contexts_command_dispatch(self) -> None:
+        service = FakeService()
+        service.list_contexts_response = {
+            "status": "success",
+            "data": {
+                "contexts": [
+                    {"context_id": "default", "instance_id": "inst-1", "namespace_id": "company_docs"},
+                    {"context_id": "team-a", "instance_id": "inst-2", "namespace_id": "ops"},
+                ]
+            },
+            "meta": {"count": 2},
+            "text": "ok",
+        }
+        buffer = io.StringIO()
+        with redirect_stdout(buffer):
+            exit_code = run_cli(["contexts"], service=service)
+
+        self.assertEqual(exit_code, 0)
+        self.assertEqual(len(service.calls), 1)
+        self.assertEqual(service.calls[0][0], "list_active_contexts")
+
+    def test_context_delete_uses_current_context_id(self) -> None:
+        service = FakeService()
+        buffer = io.StringIO()
+        with redirect_stdout(buffer):
+            exit_code = run_cli(["--context-id", "work", "context-delete"], service=service)
+
+        self.assertEqual(exit_code, 0)
+        self.assertEqual(len(service.calls), 1)
+        name, payload = service.calls[0]
+        self.assertEqual(name, "clear_active_context")
+        self.assertEqual(payload["context_id"], "work")
+
+    def test_health_command_dispatch(self) -> None:
+        service = FakeService()
+        buffer = io.StringIO()
+        with redirect_stdout(buffer):
+            exit_code = run_cli(["health"], service=service)
+
+        self.assertEqual(exit_code, 0)
+        self.assertEqual(len(service.calls), 1)
+        self.assertEqual(service.calls[0][0], "health_check")
 
     def test_namespaces_command_uses_context_id(self) -> None:
         service = FakeService()

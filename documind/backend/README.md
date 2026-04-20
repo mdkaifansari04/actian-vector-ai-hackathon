@@ -80,6 +80,9 @@ Then use:
 
 ```bash
 dcli context-show
+dcli contexts
+dcli --context-id default context-delete
+dcli health
 dcli search-docs --qr "deploy command" --top-k 5
 dcli ask-docs -qs "What is the deploy command?" --top-k 5
 ```

@@ -199,6 +199,58 @@ class DocuMindMCPService:
             text=f"Active context is {active.instance_id}/{active.namespace_id}.",
         )
 
+    def list_active_contexts(self) -> dict[str, Any]:
+        try:
+            contexts = self._context_store.list()
+        except Exception as exc:
+            return self._error(
+                error="server_error",
+                text=(
+                    "Failed to load saved contexts. "
+                    "Set DOCUMIND_CONTEXT_STORE_PATH to a readable path and retry."
+                ),
+                extra_meta={"reason": "context_store_unreadable", "detail": str(exc)},
+            )
+
+        rows = [context.as_dict() for context in contexts]
+        return self._success(
+            data={"contexts": rows},
+            meta={"count": len(rows)},
+            text=f"Found {len(rows)} saved context(s).",
+        )
+
+    def clear_active_context(self, *, context_id: str | None = None) -> dict[str, Any]:
+        resolved_context_id = self._resolve_context_id(context_id)
+        try:
+            deleted = self._context_store.delete(resolved_context_id)
+        except Exception as exc:
+            return self._error(
+                error="server_error",
+                text=(
+                    "Failed to delete saved context. "
+                    "Set DOCUMIND_CONTEXT_STORE_PATH to a writable path and retry."
+                ),
+                extra_meta={
+                    "reason": "context_store_unwritable",
+                    "detail": str(exc),
+                    "context_id": resolved_context_id,
+                },
+            )
+
+        if not deleted:
+            return self._error(
+                error="not_found",
+                text=f"No active context found for context_id '{resolved_context_id}'.",
+                data={"context_id": resolved_context_id},
+                extra_meta={"context_id": resolved_context_id},
+            )
+
+        return self._success(
+            data={"context_id": resolved_context_id, "deleted": True},
+            meta={"context_id": resolved_context_id},
+            text=f"Cleared active context '{resolved_context_id}'.",
+        )
+
     def set_active_context(
         self,
         *,
@@ -308,6 +360,33 @@ class DocuMindMCPService:
             data={"instances": items},
             meta={"count": len(items)},
             text=f"Found {len(items)} instance(s).",
+        )
+
+    def health_check(self) -> dict[str, Any]:
+        try:
+            status_code, response_data = self._api_client.get_json(
+                "/health",
+                {},
+                self._timeouts.search_seconds,
+            )
+        except httpx.TimeoutException:
+            return self._error(error="timeout", text="health check timed out.")
+        except Exception as exc:
+            return self._request_exception(operation="health check", exc=exc)
+
+        if status_code != 200:
+            mapped = self._map_http_error(status_code)
+            detail = str(response_data.get("detail", "Health check failed"))
+            return self._error(error=mapped, text=detail, http_status=status_code)
+
+        backend_status = str(response_data.get("status", "unknown")).strip() or "unknown"
+        return self._success(
+            data={
+                "backend_status": backend_status,
+                "api_url": self._resolved_api_url(),
+            },
+            meta={"http_status": status_code},
+            text=f"Backend health is {backend_status}.",
         )
 
     def create_instance(self, *, name: str, description: str = "") -> dict[str, Any]:

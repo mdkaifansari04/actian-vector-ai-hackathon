@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 import threading
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -31,7 +31,7 @@ class ActiveContextStore:
 
     @staticmethod
     def _now() -> str:
-        return datetime.utcnow().isoformat()
+        return datetime.now(UTC).isoformat().replace("+00:00", "Z")
 
     def _load_unlocked(self) -> dict[str, Any]:
         if not self._path.exists():
@@ -100,3 +100,44 @@ class ActiveContextStore:
             }
             self._save_unlocked(data)
         return active
+
+    def list(self) -> list[ActiveContext]:
+        with self._lock:
+            data = self._load_unlocked()
+            contexts = data.get("contexts", {})
+            if not isinstance(contexts, dict):
+                return []
+            entries: list[ActiveContext] = []
+            for context_id in sorted(contexts):
+                raw = contexts.get(context_id)
+                if not isinstance(raw, dict):
+                    continue
+                instance_id = str(raw.get("instance_id", "")).strip()
+                namespace_id = str(raw.get("namespace_id", "")).strip()
+                updated_at = str(raw.get("updated_at", "")).strip()
+                if not instance_id or not namespace_id:
+                    continue
+                entries.append(
+                    ActiveContext(
+                        context_id=context_id,
+                        instance_id=instance_id,
+                        namespace_id=namespace_id,
+                        updated_at=updated_at or self._now(),
+                    )
+                )
+            return entries
+
+    def delete(self, context_id: str) -> bool:
+        resolved_context_id = context_id.strip()
+        if not resolved_context_id:
+            return False
+        with self._lock:
+            data = self._load_unlocked()
+            contexts = data.get("contexts", {})
+            if not isinstance(contexts, dict):
+                return False
+            if resolved_context_id not in contexts:
+                return False
+            del contexts[resolved_context_id]
+            self._save_unlocked(data)
+            return True

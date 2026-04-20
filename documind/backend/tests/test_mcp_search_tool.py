@@ -43,6 +43,20 @@ class FakeContextStore:
         self._contexts[context_id] = payload
         return self.get(context_id)
 
+    def list(self):
+        entries = []
+        for context_id in sorted(self._contexts):
+            row = self.get(context_id)
+            if row is not None:
+                entries.append(row)
+        return entries
+
+    def delete(self, context_id: str) -> bool:
+        if context_id not in self._contexts:
+            return False
+        del self._contexts[context_id]
+        return True
+
 
 class FakeAPIClient:
     def __init__(self, post_responses=None, get_responses=None):
@@ -429,6 +443,63 @@ class MCPToolOtherTests(unittest.TestCase):
         self.assertEqual(result["meta"]["error"], "server_error")
         self.assertEqual(result["meta"]["reason"], "context_store_unwritable")
         self.assertIn("Failed to persist active context", result["text"])
+
+    def test_list_active_contexts_success(self) -> None:
+        context_store = FakeContextStore()
+        context_store.set(context_id="team-a", instance_id="inst-1", namespace_id="docs")
+        context_store.set(context_id="team-b", instance_id="inst-2", namespace_id="ops")
+        service = DocuMindMCPService(
+            api_client=FakeAPIClient(),
+            timeouts=self.timeouts,
+            context_store=context_store,
+            default_context_id="default",
+        )
+
+        result = service.list_active_contexts()
+
+        self.assertEqual(result["status"], "success")
+        self.assertEqual(result["meta"]["count"], 2)
+        self.assertEqual([ctx["context_id"] for ctx in result["data"]["contexts"]], ["team-a", "team-b"])
+
+    def test_clear_active_context_success(self) -> None:
+        context_store = FakeContextStore()
+        context_store.set(context_id="team-a", instance_id="inst-1", namespace_id="docs")
+        service = DocuMindMCPService(
+            api_client=FakeAPIClient(),
+            timeouts=self.timeouts,
+            context_store=context_store,
+            default_context_id="default",
+        )
+
+        result = service.clear_active_context(context_id="team-a")
+
+        self.assertEqual(result["status"], "success")
+        self.assertEqual(result["data"]["deleted"], True)
+        self.assertEqual(result["data"]["context_id"], "team-a")
+
+    def test_clear_active_context_returns_not_found_when_missing(self) -> None:
+        service = DocuMindMCPService(
+            api_client=FakeAPIClient(),
+            timeouts=self.timeouts,
+            context_store=FakeContextStore(),
+            default_context_id="default",
+        )
+
+        result = service.clear_active_context(context_id="missing")
+
+        self.assertEqual(result["status"], "error")
+        self.assertEqual(result["meta"]["error"], "not_found")
+        self.assertIn("No active context found", result["text"])
+
+    def test_health_check_success(self) -> None:
+        fake_client = FakeAPIClient(get_responses=[(200, {"status": "ok"})])
+        service = DocuMindMCPService(api_client=fake_client, timeouts=self.timeouts)
+
+        result = service.health_check()
+
+        self.assertEqual(result["status"], "success")
+        self.assertEqual(result["data"]["backend_status"], "ok")
+        self.assertEqual(fake_client.get_calls[0][0], "/health")
 
 
 if __name__ == "__main__":

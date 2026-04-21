@@ -1,7 +1,10 @@
-import { DocsLayout } from '@/components/docs/docs-layout';
-import { CommandBlock, StepCommandBlock } from '@/components/docs/command-block';
-import { Info } from 'lucide-react';
-import Link from 'next/link';
+import { DocsLayout } from "@/components/docs/docs-layout";
+import {
+  CommandBlock,
+  StepCommandBlock,
+} from "@/components/docs/command-block";
+import { Info } from "lucide-react";
+import Link from "next/link";
 
 export default function GettingStartedPage() {
   return (
@@ -9,10 +12,38 @@ export default function GettingStartedPage() {
       pageId="getting-started"
       title="Getting Started"
       description="Clone the repo, run backend + frontend dashboard, and bootstrap DCLI with reproducible paths."
-      breadcrumbs={[{ label: 'Docs', href: '/docs' }, { label: 'Getting Started' }]}
+      breadcrumbs={[
+        { label: "Docs", href: "/docs" },
+        { label: "Getting Started" },
+      ]}
     >
+      <section id="marketing-video" className="mb-12">
+        <h2 className="text-xl font-semibold text-foreground mb-4">
+          Watch the Product Walkthrough
+        </h2>
+        <p className="text-muted-foreground leading-relaxed mb-6">
+          Before diving into setup, watch this walkthrough to see DocuMind in
+          action from document ingestion to intelligent retrieval and search.
+        </p>
+
+        <div className="rounded-xl border border-border bg-card overflow-hidden">
+          <div className="relative aspect-video w-full">
+            <iframe
+              src="https://www.youtube.com/embed/2kgAI6SgKz0?rel=0"
+              title="DocuMind Marketing Video"
+              className="absolute inset-0 w-full h-full"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              referrerPolicy="strict-origin-when-cross-origin"
+              allowFullScreen
+            />
+          </div>
+        </div>
+      </section>
+
       <section id="repo-setup" className="mb-12">
-        <h2 className="text-xl font-semibold text-foreground mb-4">Clone Repo & Project Map</h2>
+        <h2 className="text-xl font-semibold text-foreground mb-4">
+          Clone Repo & Project Map
+        </h2>
         <p className="text-muted-foreground leading-relaxed mb-4">
           Start from the official source so every path in this page makes sense.
         </p>
@@ -31,9 +62,11 @@ export default function GettingStartedPage() {
           />
         </div>
         <div className="mt-6 rounded-xl border border-border bg-card p-4">
-          <p className="text-sm font-medium text-foreground mb-2">Repo layout you will use</p>
+          <p className="text-sm font-medium text-foreground mb-2">
+            Repo layout you will use
+          </p>
           <pre className="rounded-lg border border-border bg-code-bg p-3 text-xs text-code-text overflow-x-auto">
-{`documind/
+            {`documind/
   backend/        # FastAPI, ingestion, retrieval, observability, DCLI, MCP
   frontend/       # Next.js dashboard to manage instances/KB/resources/query
   documentation/  # This docs site`}
@@ -42,7 +75,9 @@ export default function GettingStartedPage() {
       </section>
 
       <section id="prerequisites" className="mb-12">
-        <h2 className="text-xl font-semibold text-foreground mb-4">Prerequisites</h2>
+        <h2 className="text-xl font-semibold text-foreground mb-4">
+          Prerequisites
+        </h2>
         <ul className="space-y-2 text-muted-foreground">
           <li className="flex items-start gap-2">
             <span className="w-1.5 h-1.5 rounded-full bg-primary mt-2 flex-shrink-0" />
@@ -64,7 +99,9 @@ export default function GettingStartedPage() {
       </section>
 
       <section id="backend-quickstart" className="mb-12">
-        <h2 className="text-xl font-semibold text-foreground mb-6">Backend Quick Start (FastAPI)</h2>
+        <h2 className="text-xl font-semibold text-foreground mb-6">
+          Backend Quick Start (FastAPI)
+        </h2>
 
         <div className="space-y-8">
           <StepCommandBlock
@@ -102,7 +139,11 @@ export default function GettingStartedPage() {
             <div>
               <h4 className="font-medium text-poof-peach mb-1">Quick check</h4>
               <p className="text-sm text-muted-foreground leading-relaxed">
-                Open <code className="font-mono text-code-text bg-code-bg px-1 rounded text-xs">http://localhost:8000/health</code>. If it returns OK, backend is up.
+                Open{" "}
+                <code className="font-mono text-code-text bg-code-bg px-1 rounded text-xs">
+                  http://localhost:8000/health
+                </code>
+                . If it returns OK, backend is up.
               </p>
             </div>
           </div>
@@ -110,9 +151,12 @@ export default function GettingStartedPage() {
       </section>
 
       <section id="frontend-quickstart" className="mb-12">
-        <h2 className="text-xl font-semibold text-foreground mb-6">Frontend Quick Start (Dashboard)</h2>
+        <h2 className="text-xl font-semibold text-foreground mb-6">
+          Frontend Quick Start (Dashboard)
+        </h2>
         <p className="text-muted-foreground leading-relaxed mb-4">
-          The dashboard is your control center: create instances, manage knowledge bases, ingest resources, and run search/ask flows.
+          The dashboard is your control center: create instances, manage
+          knowledge bases, ingest resources, and run search/ask flows.
         </p>
 
         <div className="space-y-8">
@@ -147,7 +191,9 @@ export default function GettingStartedPage() {
       </section>
 
       <section id="dcli-quickstart" className="mb-12">
-        <h2 className="text-xl font-semibold text-foreground mb-6">DCLI Quick Start</h2>
+        <h2 className="text-xl font-semibold text-foreground mb-6">
+          DCLI Quick Start
+        </h2>
 
         <div className="space-y-8">
           <StepCommandBlock
@@ -181,10 +227,14 @@ export default function GettingStartedPage() {
       </section>
 
       <section id="run-order" className="mb-12">
-        <h2 className="text-xl font-semibold text-foreground mb-4">Run Order & Sanity Checks</h2>
+        <h2 className="text-xl font-semibold text-foreground mb-4">
+          Run Order & Sanity Checks
+        </h2>
         <div className="space-y-4">
           <div className="rounded-xl border border-border bg-card p-4">
-            <p className="text-sm font-medium text-foreground mb-2">Recommended order</p>
+            <p className="text-sm font-medium text-foreground mb-2">
+              Recommended order
+            </p>
             <ol className="list-decimal pl-5 space-y-1 text-sm text-muted-foreground">
               <li>Start backend server first.</li>
               <li>Start frontend dashboard second.</li>
@@ -201,9 +251,12 @@ open http://localhost:3000`}
       </section>
 
       <section id="next-steps" className="mt-12 pt-8 border-t border-border">
-        <h2 className="text-xl font-semibold text-foreground mb-4">Next Steps</h2>
+        <h2 className="text-xl font-semibold text-foreground mb-4">
+          Next Steps
+        </h2>
         <p className="text-muted-foreground leading-relaxed mb-6">
-          Once backend + dashboard + CLI are running, move to architecture and component docs for deeper system understanding.
+          Once backend + dashboard + CLI are running, move to architecture and
+          component docs for deeper system understanding.
         </p>
         <div className="grid gap-3 sm:grid-cols-2">
           <Link
@@ -214,7 +267,9 @@ open http://localhost:3000`}
               <span className="font-medium text-foreground group-hover:text-primary transition-colors">
                 Architecture
               </span>
-              <p className="text-xs text-muted-foreground">How data moves end-to-end</p>
+              <p className="text-xs text-muted-foreground">
+                How data moves end-to-end
+              </p>
             </div>
           </Link>
 
@@ -226,7 +281,9 @@ open http://localhost:3000`}
               <span className="font-medium text-foreground group-hover:text-primary transition-colors">
                 Components
               </span>
-              <p className="text-xs text-muted-foreground">Backend services + dashboard modules</p>
+              <p className="text-xs text-muted-foreground">
+                Backend services + dashboard modules
+              </p>
             </div>
           </Link>
         </div>

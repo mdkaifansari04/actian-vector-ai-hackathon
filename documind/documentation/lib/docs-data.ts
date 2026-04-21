@@ -82,6 +82,7 @@ export const tocItemsMap: Record<string, TocItem[]> = {
     { id: 'technical-stack', title: 'Technical Stack', level: 1 },
   ],
   'getting-started': [
+    { id: 'marketing-video', title: 'Product Walkthrough', level: 1 },
     { id: 'repo-setup', title: 'Clone & Repo Map', level: 1 },
     { id: 'prerequisites', title: 'Prerequisites', level: 1 },
     { id: 'backend-quickstart', title: 'Backend Quick Start', level: 1 },

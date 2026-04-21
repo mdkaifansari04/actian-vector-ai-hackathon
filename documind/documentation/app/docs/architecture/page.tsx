@@ -98,12 +98,6 @@ export default function ArchitecturePage() {
             className="hidden w-full h-auto dark:block"
             priority
           />
-          <div className="border-t border-border px-4 py-3">
-            <p className="text-xs text-muted-foreground">
-              Auto-switches between <code className="font-mono bg-code-bg px-1 py-0.5 rounded">arch-light.png</code> and{' '}
-              <code className="font-mono bg-code-bg px-1 py-0.5 rounded">arch-dark.png</code> based on theme.
-            </p>
-          </div>
         </div>
       </section>
     </DocsLayout>

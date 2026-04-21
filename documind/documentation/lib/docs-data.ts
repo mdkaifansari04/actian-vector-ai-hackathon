@@ -67,6 +67,7 @@ export const navItems: NavItem[] = [
   { id: 'architecture', title: 'Architecture', href: '/docs/architecture', icon: 'layers' },
   { id: 'components', title: 'Components', href: '/docs/components', icon: 'box' },
   { id: 'dcli', title: 'DCLI', href: '/docs/dcli', icon: 'terminal' },
+  { id: 'agent-integration', title: 'Agent Integration', href: '/docs/agent-integration', icon: 'bot' },
   { id: 'mcp-server', title: 'MCP Server', href: '/docs/mcp-server', icon: 'server' },
   { id: 'testing', title: 'Testing & Validation', href: '/docs/testing', icon: 'check-circle' },
   { id: 'hackathon-scope', title: 'Hackathon Scope', href: '/docs/hackathon-scope', icon: 'target' },
@@ -107,6 +108,11 @@ export const tocItemsMap: Record<string, TocItem[]> = {
     { id: 'command-reference', title: 'Command Reference', level: 1 },
     { id: 'output-modes', title: 'Output Modes', level: 1 },
     { id: 'examples', title: 'Examples', level: 1 },
+  ],
+  'agent-integration': [
+    { id: 'quick-start-prompt', title: 'Quick Start Prompt', level: 1 },
+    { id: 'skill-install', title: 'Skill Install', level: 1 },
+    { id: 'full-skill-md', title: 'Full SKILL.md', level: 1 },
   ],
   'mcp-server': [
     { id: 'setup', title: 'Setup & Run', level: 1 },

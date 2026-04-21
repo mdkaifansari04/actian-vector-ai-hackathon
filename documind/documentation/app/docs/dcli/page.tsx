@@ -2,6 +2,7 @@ import { DocsLayout } from '@/components/docs/docs-layout';
 import { CommandBlock, StepCommandBlock } from '@/components/docs/command-block';
 import { dcliCommands } from '@/lib/docs-data';
 import { Info } from 'lucide-react';
+import Link from 'next/link';
 
 export default function DCLIPage() {
   return (
@@ -16,6 +17,16 @@ export default function DCLIPage() {
         <p className="text-muted-foreground leading-relaxed mb-6">
           DCLI is the command surface for DocuMind. If you like doing real work from the terminal instead of clicking seven panels, this is your page — respectfully.
         </p>
+
+        <div className="mb-6 p-4 rounded-lg bg-poof-mint/5 border border-poof-mint/20">
+          <p className="text-sm text-muted-foreground leading-relaxed">
+            Need ready-to-paste agent instructions? Use the{' '}
+            <Link href="/docs/agent-integration" className="text-primary underline underline-offset-4">
+              Agent Integration
+            </Link>{' '}
+            page for copy-paste prompts and full <code className="font-mono text-code-text bg-code-bg px-1 rounded text-xs">SKILL.md</code> content.
+          </p>
+        </div>
 
         <div className="space-y-6">
           <StepCommandBlock

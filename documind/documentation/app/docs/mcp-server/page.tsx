@@ -2,6 +2,7 @@ import { DocsLayout } from '@/components/docs/docs-layout';
 import { CommandBlock, StepCommandBlock } from '@/components/docs/command-block';
 import { mcpTools } from '@/lib/docs-data';
 import { AlertTriangle, Info, ShieldCheck } from 'lucide-react';
+import Link from 'next/link';
 
 export default function MCPServerPage() {
   return (
@@ -16,6 +17,17 @@ export default function MCPServerPage() {
         <p className="text-muted-foreground leading-relaxed mb-6">
           MCP is how external assistants talk to DocuMind without custom glue code. Give the assistant tools, not guesses — it behaves way better.
         </p>
+
+        <div className="mb-6 p-4 rounded-lg bg-poof-mint/5 border border-poof-mint/20">
+          <p className="text-sm text-muted-foreground leading-relaxed">
+            If you want copy-paste prompts and the full DCLI <code className="font-mono text-code-text bg-code-bg px-1 rounded text-xs">SKILL.md</code>{' '}
+            template for agents, use{' '}
+            <Link href="/docs/agent-integration" className="text-primary underline underline-offset-4">
+              Agent Integration
+            </Link>
+            .
+          </p>
+        </div>
 
         <div className="space-y-6">
           <StepCommandBlock

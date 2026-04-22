@@ -30,13 +30,29 @@ class VectorDBClient:
         ]
         return VectorAIClient(self._url, grpc_options=grpc_options)
 
+    @staticmethod
+    def _ensure_collection_open(client: VectorAIClient, name: str) -> bool:
+        if client.collections.exists(name):
+            return True
+
+        listed = client.collections.list()
+        if name not in listed:
+            return False
+
+        vde = getattr(client, "vde", None)
+        if not vde or not hasattr(vde, "open_collection"):
+            return False
+
+        vde.open_collection(name)
+        return client.collections.exists(name)
+
     def health_check(self) -> dict[str, Any]:
         with self._client() as client:
             return client.health_check()
 
     def collection_exists(self, name: str) -> bool:
         with self._client() as client:
-            return client.collections.exists(name)
+            return self._ensure_collection_open(client, name)
 
     def list_collections(self) -> list[str]:
         with self._client() as client:
@@ -45,7 +61,7 @@ class VectorDBClient:
     def create_collection(self, name: str, dim: int, distance: str = "cosine") -> None:
         metric = self.DISTANCE_MAP.get(distance, Distance.Cosine)
         with self._client() as client:
-            if client.collections.exists(name):
+            if self._ensure_collection_open(client, name):
                 return
             client.collections.create(
                 name,
@@ -55,17 +71,19 @@ class VectorDBClient:
 
     def delete_collection(self, name: str) -> None:
         with self._client() as client:
-            if client.collections.exists(name):
+            if self._ensure_collection_open(client, name):
                 client.collections.delete(name)
 
     def upsert_points(self, collection_name: str, points: Sequence[PointStruct]) -> None:
         if not points:
             return
         with self._client() as client:
+            self._ensure_collection_open(client, collection_name)
             client.points.upsert(collection_name, list(points))
 
     def search(self, collection_name: str, vector: list[float], top_k: int = 5, filters: Any = None) -> list[Any]:
         with self._client() as client:
+            self._ensure_collection_open(client, collection_name)
             return client.points.search(
                 collection_name,
                 vector=vector,
@@ -82,6 +100,7 @@ class VectorDBClient:
         filters: Any = None,
     ) -> tuple[list[Any], int | str | None]:
         with self._client() as client:
+            self._ensure_collection_open(client, collection_name)
             return client.points.scroll(
                 collection_name,
                 limit=limit,
@@ -93,6 +112,7 @@ class VectorDBClient:
 
     def count_points(self, collection_name: str) -> int:
         with self._client() as client:
+            self._ensure_collection_open(client, collection_name)
             return client.points.count(collection_name)
 
 

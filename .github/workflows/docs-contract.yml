@@ -1,0 +1,17 @@
+name: Docs Contract
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  docs-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run docs contract check
+        run: ./scripts/check-doc-contracts.sh

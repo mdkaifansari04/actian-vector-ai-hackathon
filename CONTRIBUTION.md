@@ -1,6 +1,6 @@
 # Contribution Guide
 
-Last updated: 2026-04-23
+Last updated: 2026-04-25
 
 This project has multiple moving parts (backend API, frontend UI, CLI, MCP server).  
 Keep contributions focused, testable, and easy to review.
@@ -8,6 +8,11 @@ Keep contributions focused, testable, and easy to review.
 ## 1) Before you start
 
 - Read the root [`README.md`](README.md) for current feature status and architecture.
+- Read root agentic workflow contracts:
+  - `AGENTS.md`
+  - `TODOS.md`
+  - `DECISIONS.md`
+  - `docs/docs-index.md`
 - If your change affects backend behavior, also read:
   - `documind/backend/README.md`
   - `documind/backend/IMPLEMENTATION_TEST_GUIDE.md`
@@ -51,7 +56,7 @@ docker compose up -d
 - Keep commits atomic (one concern per commit).
 - Prefer Conventional Commit prefixes:
   - `feat:`, `fix:`, `docs:`, `refactor:`, `test:`, `chore:`, `build:`
-- Follow `docs/commit.md` for detailed commit hygiene.
+- Follow `COMMIT.md` for detailed commit hygiene and micro-commit batching.
 
 ## 4) Engineering expectations
 
@@ -100,6 +105,12 @@ cd documind/backend
 source .venv/bin/activate
 dcli context-show --bot=true
 ./run_mcp_server.sh
+```
+
+### Docs contract (required when touching contract docs)
+
+```bash
+./scripts/check-doc-contracts.sh
 ```
 
 ## 6) Pull request checklist
